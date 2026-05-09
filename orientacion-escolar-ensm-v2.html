@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Orientación Escolar ENSM · v2</title>
+  <meta name="description" content="Boceto v2 para la web de Orientación Escolar de la Escuela Normal Superior de Monterrey, preparada para leer contenido desde Google Sheets pública." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root, [data-theme="light"] {
+      --bg: #f7f4ef;
+      --surface: #fcfaf7;
+      --surface-2: #f1ece4;
+      --surface-3: #ece6de;
+      --text: #1e241f;
+      --text-muted: #5f695f;
+      --text-faint: #8a9189;
+      --border: rgba(30, 36, 31, 0.12);
+      --primary: #1c6863;
+      --primary-2: #2f8781;
+      --accent: #ba7c56;
+      --highlight: rgba(28, 104, 99, 0.12);
+      --highlight-2: rgba(186, 124, 86, 0.10);
+      --shadow-sm: 0 6px 18px rgba(25, 29, 25, 0.06);
+      --shadow-md: 0 18px 50px rgba(25, 29, 25, 0.10);
+      --radius-sm: 14px;
+      --radius-md: 22px;
+      --radius-lg: 30px;
+      --content: 1180px;
+      --font-display: 'Instrument Serif', Georgia, serif;
+      --font-body: 'Inter', system-ui, sans-serif;
+      --text-xs: clamp(.75rem, .72rem + .15vw, .84rem);
+      --text-sm: clamp(.88rem, .84rem + .2vw, .96rem);
+      --text-base: clamp(.99rem, .96rem + .18vw, 1.05rem);
+      --text-lg: clamp(1.12rem, 1.06rem + .25vw, 1.22rem);
+      --text-xl: clamp(1.6rem, 1.25rem + 1vw, 2.15rem);
+      --text-2xl: clamp(2.25rem, 1.45rem + 2.2vw, 3.4rem);
+      --space-2: .5rem;
+      --space-3: .75rem;
+      --space-4: 1rem;
+      --space-5: 1.25rem;
+      --space-6: 1.5rem;
+      --space-8: 2rem;
+      --space-10: 2.5rem;
+      --space-12: 3rem;
+      --space-16: 4rem;
+    }
+
+    [data-theme="dark"] {
+      --bg: #131816;
+      --surface: #1a1f1c;
+      --surface-2: #222925;
+      --surface-3: #29312c;
+      --text: #edf1eb;
+      --text-muted: #b2bab3;
+      --text-faint: #899189;
+      --border: rgba(237, 241, 235, 0.12);
+      --primary: #6cb0a9;
+      --primary-2: #8ccac3;
+      --accent: #d5a07a;
+      --highlight: rgba(108, 176, 169, 0.12);
+      --highlight-2: rgba(213, 160, 122, 0.10);
+      --shadow-sm: 0 6px 18px rgba(0,0,0,.22);
+      --shadow-md: 0 18px 50px rgba(0,0,0,.32);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      color: var(--text);
+      background:
+        radial-gradient(circle at 0% 0%, rgba(186,124,86,.10), transparent 24%),
+        radial-gradient(circle at 100% 0%, rgba(28,104,99,.08), transparent 28%),
+        var(--bg);
+      line-height: 1.62;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img, svg { max-width: 100%; display: block; }
+    button { font: inherit; cursor: pointer; }
+
+    .container { width: min(100% - 2rem, var(--content)); margin: 0 auto; }
+    .skip-link { position: absolute; left: -9999px; }
+    .skip-link:focus { left: 1rem; top: 1rem; z-index: 1000; padding: .8rem 1rem; border-radius: 12px; background: var(--primary); color: #fff; }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 60;
+      backdrop-filter: blur(14px);
+      background: color-mix(in srgb, var(--bg) 84%, transparent);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: .9rem 0;
+    }
+
+    .brand { display: flex; gap: .9rem; align-items: center; min-width: 0; }
+    .brand-mark {
+      width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center;
+      background: linear-gradient(135deg, var(--highlight), rgba(255,255,255,.6));
+      color: var(--primary); border: 1px solid var(--border); box-shadow: var(--shadow-sm);
+      flex-shrink: 0;
+    }
+    .brand-text strong { display: block; font-size: var(--text-sm); }
+    .brand-text span { display: block; color: var(--text-muted); font-size: var(--text-xs); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .nav-links { display: flex; gap: .35rem; flex-wrap: wrap; justify-content: center; }
+    .nav-links a {
+      padding: .66rem .9rem; border-radius: 999px; color: var(--text-muted); font-size: var(--text-sm); transition: .2s ease;
+    }
+    .nav-links a:hover { background: var(--surface); color: var(--text); }
+
+    .nav-actions { display: flex; align-items: center; gap: .65rem; }
+    .theme-toggle, .menu-toggle {
+      width: 44px; height: 44px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--text);
+      display: grid; place-items: center; box-shadow: var(--shadow-sm);
+    }
+    .menu-toggle { display: none; }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: .5rem; min-height: 44px;
+      border-radius: 999px; padding: .86rem 1.18rem; font-size: var(--text-sm); font-weight: 600;
+      border: 1px solid transparent; transition: transform .2s ease, background .2s ease, border-color .2s ease;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-2); }
+    .btn-secondary { background: var(--surface); border-color: var(--border); }
+    .btn-ghost { background: transparent; border-color: var(--border); color: var(--text-muted); }
+
+    .hero {
+      position: relative;
+      padding: clamp(2rem, 4vw, 3.3rem) 0 1.6rem;
+      overflow: clip;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: .95fr 1.05fr;
+      gap: 1.8rem;
+      align-items: stretch;
+      min-height: 76vh;
+    }
+
+    .hero-copy {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: .5rem 0;
+    }
+
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: .5rem; width: fit-content;
+      padding: .45rem .78rem; border-radius: 999px; border: 1px solid var(--border);
+      background: color-mix(in srgb, var(--surface) 84%, white 16%); color: var(--text-muted); font-size: var(--text-xs);
+      margin-bottom: 1rem;
+    }
+
+    h1, h2, h3 { margin: 0; }
+
+    .hero-copy h1 {
+      font-family: var(--font-display);
+      font-size: var(--text-2xl);
+      line-height: .95;
+      letter-spacing: -.04em;
+      max-width: 10.5ch;
+    }
+
+    .hero-copy h1 em { color: var(--primary); font-style: italic; }
+    .hero-copy .lead { color: var(--text-muted); font-size: var(--text-base); max-width: 54ch; margin: 1rem 0 0; }
+
+    .hero-actions {
+      display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.35rem;
+    }
+
+    .hero-note {
+      margin-top: 1.1rem; color: var(--text-faint); font-size: var(--text-xs); max-width: 58ch;
+    }
+
+    .hero-panel {
+      position: relative;
+      border-radius: 32px;
+      border: 1px solid var(--border);
+      background:
+        radial-gradient(circle at 18% 22%, rgba(255,255,255,.75), transparent 18%),
+        radial-gradient(circle at 78% 24%, rgba(186,124,86,.18), transparent 18%),
+        radial-gradient(circle at 64% 76%, rgba(28,104,99,.16), transparent 24%),
+        linear-gradient(180deg, color-mix(in srgb, var(--surface) 78%, white 22%), var(--surface-2));
+      min-height: 620px;
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+      isolation: isolate;
+    }
+
+    .hero-panel::before {
+      content: "";
+      position: absolute;
+      inset: -10% auto auto -8%;
+      width: 240px; height: 240px; border-radius: 999px; background: var(--highlight-2); filter: blur(30px);
+      animation: drift 13s ease-in-out infinite;
+    }
+
+    .hero-panel::after {
+      content: "";
+      position: absolute;
+      inset: auto -8% -12% auto;
+      width: 270px; height: 270px; border-radius: 999px; background: var(--highlight); filter: blur(34px);
+      animation: drift 14s ease-in-out infinite reverse;
+    }
+
+    .hero-inner {
+      position: relative; z-index: 1; height: 100%; padding: 1.15rem; display: grid; grid-template-rows: auto 1fr auto;
+    }
+
+    .hero-topbar {
+      display: flex; justify-content: space-between; align-items: center; gap: .6rem;
+    }
+
+    .soft-pill {
+      padding: .5rem .72rem; border-radius: 999px; font-size: var(--text-xs); color: var(--text-muted);
+      background: rgba(255,255,255,.65); border: 1px solid rgba(255,255,255,.48); backdrop-filter: blur(8px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .hero-stage {
+      position: relative;
+      min-height: 420px;
+      margin-top: .7rem;
+    }
+
+    .constellation,
+    .paths,
+    .people-layer,
+    .rings-layer {
+      position: absolute; inset: 0;
+    }
+
+    .constellation svg,
+    .paths svg,
+    .rings-layer svg {
+      width: 100%; height: 100%;
+    }
+
+    .floating-node {
+      position: absolute;
+      width: 16px; height: 16px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), #fff3);
+      box-shadow: 0 0 0 8px rgba(186,124,86,.12), 0 0 32px rgba(186,124,86,.22);
+      animation: pulse 5s ease-in-out infinite;
+    }
+
+    .floating-node.n1 { left: 11%; bottom: 20%; }
+    .floating-node.n2 { left: 38%; top: 50%; animation-delay: -2s; }
+    .floating-node.n3 { right: 16%; top: 19%; animation-delay: -1s; background: linear-gradient(135deg, var(--primary), #fff3); box-shadow: 0 0 0 8px rgba(28,104,99,.12), 0 0 32px rgba(28,104,99,.22); }
+    .floating-node.n4 { right: 28%; bottom: 15%; animation-delay: -3s; }
+
+    .person-card {
+      position: absolute;
+      width: 98px;
+      aspect-ratio: .82;
+      border-radius: 28px;
+      border: 1px solid rgba(255,255,255,.55);
+      background: linear-gradient(180deg, rgba(255,255,255,.78), rgba(255,255,255,.52));
+      box-shadow: var(--shadow-sm);
+      backdrop-filter: blur(10px);
+      display: grid; place-items: center;
+      animation: bob 8s ease-in-out infinite;
+    }
+
+    .person-card::before {
+      content: "";
+      width: 28px; height: 28px; border-radius: 50%;
+      background: color-mix(in srgb, var(--primary) 30%, white 70%);
+      box-shadow: 0 34px 0 9px color-mix(in srgb, var(--primary) 16%, white 84%);
+      display: block;
+    }
+
+    .person-card.p1 { left: 10%; bottom: 17%; }
+    .person-card.p2 { left: 38%; top: 43%; animation-delay: -2.5s; }
+    .person-card.p3 { right: 14%; top: 15%; animation-delay: -1.3s; }
+    .person-card.p4 { right: 24%; bottom: 11%; animation-delay: -4.2s; }
+
+    .hero-bottom {
+      display: grid; grid-template-columns: 1.1fr .9fr; gap: .8rem;
+    }
+
+    .glass-card {
+      border-radius: 24px;
+      padding: 1rem 1.05rem;
+      border: 1px solid rgba(255,255,255,.52);
+      background: rgba(255,255,255,.66);
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .glass-card strong {
+      display: block; margin-bottom: .28rem; font-size: var(--text-sm);
+    }
+
+    .glass-card p { margin: 0; color: var(--text-muted); font-size: var(--text-xs); }
+
+    main section { padding: 1.7rem 0; }
+
+    .section-head {
+      display: flex; justify-content: space-between; align-items: end; gap: 1rem; margin-bottom: 1rem;
+    }
+
+    .section-head h2 {
+      font-family: var(--font-display); font-size: var(--text-xl); line-height: 1; letter-spacing: -.03em;
+    }
+
+    .section-head p { margin: 0; color: var(--text-muted); max-width: 56ch; font-size: var(--text-sm); }
+
+    .grid-4, .grid-3, .grid-2, .stats-grid {
+      display: grid; gap: 1rem;
+    }
+    .grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .stats-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+    .card {
+      background: color-mix(in srgb, var(--surface) 92%, white 8%);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 1rem;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::after {
+      content: "";
+      position: absolute; right: -8%; bottom: -24%; width: 140px; height: 140px; border-radius: 999px;
+      background: var(--highlight); filter: blur(24px); opacity: .75; pointer-events: none;
+    }
+
+    .tag-row { display: flex; flex-wrap: wrap; gap: .45rem; margin-bottom: .55rem; }
+    .tag {
+      display: inline-flex; align-items: center; gap: .3rem; padding: .3rem .58rem; border-radius: 999px;
+      background: var(--highlight); color: var(--primary); font-size: .75rem; font-weight: 600;
+    }
+
+    .icon-box {
+      width: 46px; height: 46px; border-radius: 16px; display: grid; place-items: center;
+      background: color-mix(in srgb, var(--highlight) 80%, white 20%); color: var(--primary); margin-bottom: .85rem;
+    }
+
+    .card h3 { font-size: var(--text-base); line-height: 1.2; margin-bottom: .35rem; }
+    .card p { margin: 0; color: var(--text-muted); font-size: var(--text-sm); }
+
+    .link-inline {
+      display: inline-flex; align-items: center; gap: .35rem; margin-top: .9rem; color: var(--primary); font-weight: 600; font-size: var(--text-sm);
+    }
+
+    .stats-card { text-align: center; }
+    .stats-card strong {
+      display: block; font-family: var(--font-display); font-size: clamp(1.8rem, 3vw, 2.4rem); color: var(--primary); line-height: 1; margin-bottom: .35rem;
+    }
+    .stats-card span { color: var(--text-muted); font-size: var(--text-xs); }
+
+    .agenda-list { display: grid; gap: .8rem; }
+    .agenda-item {
+      display: grid; grid-template-columns: auto 1fr auto; gap: .9rem; align-items: center;
+      border-radius: 20px; border: 1px solid var(--border); background: color-mix(in srgb, var(--surface) 90%, white 10%); padding: .9rem;
+    }
+    .date-chip {
+      min-width: 74px; border-radius: 16px; background: var(--highlight); color: var(--primary); text-align: center; padding: .75rem .6rem; font-weight: 800; line-height: 1;
+    }
+    .date-chip span { display: block; margin-top: .22rem; font-size: .74rem; font-weight: 600; }
+    .agenda-item strong { display: block; font-size: var(--text-sm); margin-bottom: .15rem; }
+    .agenda-meta { display: flex; flex-wrap: wrap; gap: .65rem; color: var(--text-faint); font-size: var(--text-xs); margin-top: .35rem; }
+
+    .sheet-shell {
+      display: grid; grid-template-columns: 300px 1fr; gap: 1rem;
+    }
+
+    .sheet-sidebar .card + .card,
+    .faq details + details { margin-top: .8rem; }
+
+    .sheet-status {
+      font-size: var(--text-xs); color: var(--text-muted); display: flex; align-items: center; gap: .5rem;
+    }
+
+    .status-dot {
+      width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 6px rgba(186,124,86,.12);
+    }
+
+    .code-block {
+      margin-top: .8rem; padding: .9rem; border-radius: 18px; border: 1px solid var(--border);
+      background: color-mix(in srgb, var(--surface-2) 65%, white 35%); overflow: auto;
+      font-size: .8rem; color: var(--text-muted); line-height: 1.55; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    .resource-card, .campaign-card { min-height: 220px; }
+
+    .contact-list { display: grid; gap: .75rem; margin-top: .9rem; }
+    .contact-item {
+      display: grid; grid-template-columns: 42px 1fr; gap: .75rem; align-items: center;
+      padding: .85rem; border-radius: 18px; border: 1px solid var(--border); background: color-mix(in srgb, var(--surface-2) 70%, white 30%);
+    }
+    .contact-item .icon-box { margin: 0; width: 42px; height: 42px; border-radius: 14px; }
+    .contact-item strong { display: block; font-size: var(--text-sm); }
+    .contact-item span { display: block; color: var(--text-muted); font-size: var(--text-xs); }
+
+    .faq details {
+      border-radius: 18px; border: 1px solid var(--border); background: color-mix(in srgb, var(--surface) 94%, white 6%); padding: .95rem 1rem;
+    }
+    .faq summary { cursor: pointer; font-weight: 600; font-size: var(--text-sm); }
+    .faq p { margin: .65rem 0 0; color: var(--text-muted); font-size: var(--text-sm); }
+
+    .footer { padding: 2rem 0 3rem; }
+    .footer-card {
+      display: grid; grid-template-columns: 1.1fr .9fr; gap: 1rem; align-items: center;
+    }
+    .footer-card h2 { font-family: var(--font-display); font-size: var(--text-xl); line-height: 1; letter-spacing: -.03em; margin-bottom: .55rem; }
+    .footer-card p { margin: 0; color: var(--text-muted); font-size: var(--text-sm); max-width: 58ch; }
+
+    [data-reveal] { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s ease; }
+    [data-reveal].is-visible { opacity: 1; transform: translateY(0); }
+
+    @keyframes drift {
+      0%, 100% { transform: translate(0,0); }
+      50% { transform: translate(10px,-12px); }
+    }
+    @keyframes bob {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    @keyframes pulse {
+      0%,100% { transform: scale(1); opacity: .95; }
+      50% { transform: scale(1.12); opacity: .75; }
+    }
+
+    @media (max-width: 1100px) {
+      .hero-grid, .grid-2, .footer-card, .sheet-shell { grid-template-columns: 1fr; }
+      .grid-4, .grid-3, .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .hero-panel { min-height: 560px; }
+    }
+
+    @media (max-width: 860px) {
+      .nav-wrap { flex-wrap: wrap; }
+      .nav-links {
+        display: none; width: 100%; flex-direction: column; align-items: stretch; padding-top: .4rem;
+      }
+      .nav-links.open { display: flex; }
+      .nav-links a { border-radius: 16px; padding: .82rem .95rem; }
+      .menu-toggle { display: grid; }
+      .hero-grid { grid-template-columns: 1fr; min-height: auto; }
+      .hero-copy { order: 2; }
+      .hero-panel { order: 1; min-height: 480px; }
+      .hero-bottom { grid-template-columns: 1fr; }
+      .section-head { flex-direction: column; align-items: start; }
+      .grid-4, .grid-3, .stats-grid { grid-template-columns: 1fr; }
+      .agenda-item { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 560px) {
+      .container { width: min(100% - 1rem, var(--content)); }
+      .hero-panel { min-height: 420px; border-radius: 24px; }
+      .person-card { width: 76px; border-radius: 22px; }
+      .hero-stage { min-height: 280px; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a class="brand" href="#inicio">
+        <div class="brand-mark" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3c2.4 2.7 5.1 4.4 8 5.1-.2 5.8-3.1 9.6-8 12.9C7.1 17.7 4.2 13.9 4 8.1 6.9 7.4 9.6 5.7 12 3Z"></path>
+            <path d="M8 13c1.2-.7 2.3-1 3.3-1 1.7 0 3 .7 4.7 2.6"></path>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <strong>Orientación Escolar</strong>
+          <span>Escuela Normal Superior de Monterrey</span>
+        </div>
+      </a>
+
+      <nav class="nav-links" id="navLinks" aria-label="Principal">
+        <a href="#inicio">Inicio</a>
+        <a href="#area">El área</a>
+        <a href="#campanas">Campañas</a>
+        <a href="#actividades">Actividades</a>
+        <a href="#comunicados">Comunicados</a>
+        <a href="#recursos">Recursos</a>
+        <a href="#datos">Google Sheet</a>
+        <a href="#contacto">Contacto</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="theme-toggle" type="button" data-theme-toggle aria-label="Cambiar tema"></button>
+        <button class="menu-toggle" type="button" id="menuToggle" aria-label="Abrir menú">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"></path></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="contenido">
+    <section class="hero" id="inicio">
+      <div class="container hero-grid">
+        <div class="hero-copy" data-reveal>
+          <div class="eyebrow">Boceto v2 · más simbólico, más ligero, listo para datos dinámicos</div>
+          <h1>Un sitio para <em>acompañar trayectorias</em>, escuchar procesos y abrir caminos.</h1>
+          <p class="lead">Esta versión reorganiza la primera pantalla para que el hero visual sea verdaderamente protagonista: una red viva de trayectorias, encuentros y nodos de apoyo que simbolizan orientación, vínculo y desarrollo integral.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="https://wa.me/573214637057" target="_blank" rel="noopener noreferrer">Solicitar orientación</a>
+            <a class="btn btn-secondary" href="#datos">Ver arquitectura Sheets</a>
+            <a class="btn btn-ghost" href="#campanas">Explorar secciones</a>
+          </div>
+          <p class="hero-note">La escala tipográfica fue ajustada para que la web respire mejor: titulares menos dominantes, tarjetas más compactas y lectura más equilibrada en escritorio y móvil.</p>
+        </div>
+
+        <div class="hero-panel" data-reveal aria-hidden="true">
+          <div class="hero-inner">
+            <div class="hero-topbar">
+              <div class="soft-pill">Escucha</div>
+              <div class="soft-pill">Acompañamiento</div>
+              <div class="soft-pill">Proyecto de vida</div>
+            </div>
+
+            <div class="hero-stage">
+              <div class="constellation">
+                <svg viewBox="0 0 100 100" fill="none">
+                  <path d="M12 78C23 65 29 59 39 54c9-5 17-4 27-9 9-5 15-12 20-24" stroke="rgba(255,255,255,.86)" stroke-width="5.8" stroke-linecap="round"></path>
+                  <path d="M12 78C23 65 29 59 39 54c9-5 17-4 27-9 9-5 15-12 20-24" stroke="rgba(28,104,99,.18)" stroke-width="15" stroke-linecap="round"></path>
+                  <path d="M13 78C20 70 28 67 37 68c7 1 13 7 21 7 11 0 22-8 29-18" stroke="rgba(186,124,86,.24)" stroke-width="8" stroke-linecap="round"></path>
+                </svg>
+              </div>
+
+              <div class="paths">
+                <svg viewBox="0 0 100 100" fill="none">
+                  <path d="M12 78C18 60 28 47 39 41c13-8 30-5 47-24" stroke="rgba(28,104,99,.22)" stroke-width="1.2" stroke-dasharray="2.2 3.5" stroke-linecap="round"></path>
+                  <path d="M15 79C25 75 33 76 42 79c8 3 16 6 28 0 8-4 13-10 16-15" stroke="rgba(186,124,86,.22)" stroke-width="1.2" stroke-dasharray="2.2 3.5" stroke-linecap="round"></path>
+                  <path d="M39 54C45 46 52 41 63 38c11-3 20-8 23-15" stroke="rgba(28,104,99,.16)" stroke-width="1.2" stroke-dasharray="2.2 3.5" stroke-linecap="round"></path>
+                </svg>
+              </div>
+
+              <div class="rings-layer">
+                <svg viewBox="0 0 100 100" fill="none">
+                  <circle cx="12" cy="78" r="7" stroke="rgba(186,124,86,.22)" stroke-width=".9"></circle>
+                  <circle cx="39" cy="54" r="9" stroke="rgba(28,104,99,.18)" stroke-width=".9"></circle>
+                  <circle cx="84" cy="19" r="10" stroke="rgba(28,104,99,.22)" stroke-width=".9"></circle>
+                  <circle cx="72" cy="72" r="8" stroke="rgba(186,124,86,.18)" stroke-width=".9"></circle>
+                </svg>
+              </div>
+
+              <div class="people-layer">
+                <div class="person-card p1"></div>
+                <div class="person-card p2"></div>
+                <div class="person-card p3"></div>
+                <div class="person-card p4"></div>
+                <div class="floating-node n1"></div>
+                <div class="floating-node n2"></div>
+                <div class="floating-node n3"></div>
+                <div class="floating-node n4"></div>
+              </div>
+            </div>
+
+            <div class="hero-bottom">
+              <div class="glass-card">
+                <strong>Metáfora central</strong>
+                <p>Rutas, nodos y figuras conectadas para representar orientación como proceso vivo: escuchar, acompañar, articular y ayudar a avanzar.</p>
+              </div>
+              <div class="glass-card">
+                <strong>Preparado para crecer</strong>
+                <p>Diseño pensado para campañas, actividades, comunicados y recursos cargados desde una hoja pública.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="area">
+      <div class="container grid-2">
+        <article class="card" data-reveal>
+          <div class="tag-row"><span class="tag">El área</span><span class="tag">Enfoque pedagógico</span></div>
+          <div class="section-head" style="margin-bottom:.8rem;">
+            <div><h2>Más claridad, menos gigantismo</h2></div>
+          </div>
+          <p>Tu observación es correcta: la versión anterior estaba algo sobredimensionada. En esta v2 se redujo la escala del hero, de los títulos de sección, de las tarjetas y de los bloques informativos para lograr una lectura más elegante y menos pesada.</p>
+          <div class="stats-grid" style="margin-top:1rem;">
+            <div class="card stats-card"><strong>1</strong><span>hero más protagonista y mejor integrado al primer pantallazo</span></div>
+            <div class="card stats-card"><strong>2</strong><span>escalas tipográficas más contenidas y más cómodas</span></div>
+            <div class="card stats-card"><strong>3</strong><span>módulos listos para campañas, agenda y recursos</span></div>
+            <div class="card stats-card"><strong>4</strong><span>capas de datos preparadas para Google Sheets pública</span></div>
+          </div>
+        </article>
+
+        <article class="card" data-reveal>
+          <div class="tag-row"><span class="tag">Responsable</span><span class="tag">Contacto visible</span></div>
+          <h3>Katherine Ponce</h3>
+          <p>Terapeuta Ocupacional, Magíster en Neuropsicología y Educación. La interfaz pone su presencia de forma más sobria y mejor jerarquizada, sin competir con el hero principal pero manteniendo cercanía y respaldo profesional.</p>
+          <div class="contact-list">
+            <a class="contact-item" href="https://wa.me/573214637057" target="_blank" rel="noopener noreferrer">
+              <div class="icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12c0 5.52-4.48 10-10 10-1.74 0-3.37-.44-4.79-1.21L2 22l1.3-5.02A9.94 9.94 0 0 1 2 12C2 6.48 6.48 2 12 2s10 4.48 10 10Z"></path></svg></div>
+              <div><strong>WhatsApp</strong><span>321 463 7057</span></div>
+            </a>
+            <a class="contact-item" href="mailto:orientacionescolar@normalsuperiormonterrey.com">
+              <div class="icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16v16H4z"></path><path d="m22 6-10 7L2 6"></path></svg></div>
+              <div><strong>Correo</strong><span>orientacionescolar@normalsuperiormonterrey.com</span></div>
+            </a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="campanas">
+      <div class="container">
+        <div class="section-head" data-reveal>
+          <div><h2>Campañas como universos narrativos</h2></div>
+          <p>La arquitectura visual se mantiene, pero con tarjetas más compactas y con mejor ritmo para no saturar la pantalla.</p>
+        </div>
+        <div class="grid-3" id="campaignsGrid">
+          <article class="card campaign-card" data-reveal>
+            <div class="tag-row"><span class="tag">Convivencia</span><span class="tag">Buen trato</span></div>
+            <h3>Tejidos de convivencia</h3>
+            <p>Campaña ejemplo para cultura del buen trato, mediación y vínculos protectores dentro de la institución.</p>
+            <a class="link-inline" href="#actividades">Ver actividades</a>
+          </article>
+          <article class="card campaign-card" data-reveal>
+            <div class="tag-row"><span class="tag">Bienestar</span><span class="tag">Salud emocional</span></div>
+            <h3>Bienestar que acompaña</h3>
+            <p>Una línea para fortalecer cuidado emocional, hábitos protectores y escucha activa en la comunidad educativa.</p>
+            <a class="link-inline" href="#recursos">Ver recursos</a>
+          </article>
+          <article class="card campaign-card" data-reveal>
+            <div class="tag-row"><span class="tag">Proyecto de vida</span><span class="tag">Trayectorias</span></div>
+            <h3>Rutas para crecer</h3>
+            <p>Propuesta para decisiones, metas, intereses y construcción de trayectorias escolares significativas.</p>
+            <a class="link-inline" href="#contacto">Consultar</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="actividades">
+      <div class="container grid-2">
+        <article data-reveal>
+          <div class="section-head">
+            <div><h2>Actividades en agenda</h2></div>
+            <p>Este bloque ya está preparado para renderizar registros de una hoja pública y mostrar solo destacados o próximos eventos.</p>
+          </div>
+          <div class="agenda-list" id="activitiesList">
+            <article class="agenda-item">
+              <div class="date-chip">15<span>mayo</span></div>
+              <div>
+                <strong>Taller de emociones y convivencia</strong>
+                <p>Ejemplo de tarjeta ligera con fecha, resumen, público y campaña asociada.</p>
+                <div class="agenda-meta"><span>Estudiantes</span><span>Auditorio</span><span>Próxima</span></div>
+              </div>
+              <span class="tag">Mock</span>
+            </article>
+            <article class="agenda-item">
+              <div class="date-chip">23<span>mayo</span></div>
+              <div>
+                <strong>Escuela de familias</strong>
+                <p>Bloque pensado para agenda editable desde una hoja de cálculo pública.</p>
+                <div class="agenda-meta"><span>Familias</span><span>Salón múltiple</span><span>Destacada</span></div>
+              </div>
+              <span class="tag">Mock</span>
+            </article>
+          </div>
+        </article>
+
+        <article class="card" data-reveal>
+          <div class="tag-row"><span class="tag">Arquitectura de datos</span></div>
+          <h3>Modelo listo para CMS ligero</h3>
+          <p>La v2 ya separa visualmente las colecciones que luego leerán datos desde Google Sheets: configuración, campañas, actividades, comunicados, recursos, rutas y normatividad.</p>
+          <div class="faq" style="margin-top:1rem;">
+            <details open>
+              <summary>Pestañas sugeridas</summary>
+              <p><strong>config</strong>, <strong>campanas</strong>, <strong>actividades</strong>, <strong>comunicados</strong>, <strong>recursos</strong>, <strong>rutas</strong>, <strong>normatividad</strong> y <strong>equipo</strong>.</p>
+            </details>
+            <details>
+              <summary>Campos mínimos por registro</summary>
+              <p>ID, título, descripción, estado, destacado, orden, etiquetas, imagen o enlace, público y fechas cuando aplique.</p>
+            </details>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="comunicados">
+      <div class="container">
+        <div class="section-head" data-reveal>
+          <div><h2>Comunicados y recursos</h2></div>
+          <p>El sitio puede mezclar piezas editoriales cortas con recursos segmentados por audiencia, manteniendo una navegación clara y actualizable.</p>
+        </div>
+        <div class="grid-3">
+          <article class="card" data-reveal>
+            <div class="tag-row"><span class="tag">Comunicado</span></div>
+            <h3>Semana de bienestar</h3>
+            <p>Bloque para noticias, invitaciones, novedades institucionales o anuncios del área.</p>
+          </article>
+          <article class="card resource-card" data-reveal>
+            <div class="tag-row"><span class="tag">Recurso · Estudiantes</span></div>
+            <h3>Guías para bienestar cotidiano</h3>
+            <p>Documentos, videos o materiales breves para hábitos saludables, convivencia y proyecto de vida.</p>
+          </article>
+          <article class="card resource-card" data-reveal>
+            <div class="tag-row"><span class="tag">Recurso · Familias</span></div>
+            <h3>Acompañar desde casa</h3>
+            <p>Contenido práctico para comunicación, límites protectores y corresponsabilidad.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="recursos">
+      <div class="container grid-2">
+        <article class="card" data-reveal>
+          <div class="tag-row"><span class="tag">Rutas</span><span class="tag">Pedagogía institucional</span></div>
+          <h2 style="margin-bottom:.5rem;">Rutas de atención más comprensibles</h2>
+          <p>La web debe explicar de forma simple cuándo acudir, cómo se atiende y cuándo se articula una ruta institucional o externa. Esto encaja con el enfoque nacional de promoción, prevención, atención y seguimiento, y con el marco de convivencia escolar.[web:37][web:39][web:21][web:26]</p>
+          <div class="contact-list">
+            <div class="contact-item"><div class="icon-box">1</div><div><strong>Convivencia escolar</strong><span>Conflictos, tensiones y necesidades de mediación o acompañamiento.[web:21][web:26]</span></div></div>
+            <div class="contact-item"><div class="icon-box">2</div><div><strong>Bienestar emocional</strong><span>Escucha inicial, valoración pedagógica y posible orientación a apoyo externo.[web:37][web:39]</span></div></div>
+            <div class="contact-item"><div class="icon-box">3</div><div><strong>Vulneración de derechos</strong><span>Activación de protocolos y articulación con instancias competentes.[web:21][web:26]</span></div></div>
+          </div>
+        </article>
+
+        <article class="card" data-reveal>
+          <div class="tag-row"><span class="tag">Normatividad</span></div>
+          <h3>Base de sentido para el contenido del sitio</h3>
+          <p>El Plan Nacional de Orientación Escolar define la orientación como una acción institucional enfocada en promoción y prevención, con contribución al desarrollo socioemocional y al ejercicio de los derechos humanos en la escuela.[web:37][web:39]</p>
+          <p style="margin-top:.75rem;">La Ley 1620 de 2013 estructura el Sistema Nacional de Convivencia Escolar y la ruta de atención integral, por lo que la web debe reflejar con claridad ese componente pedagógico e institucional.[web:21][web:26]</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="datos">
+      <div class="container sheet-shell">
+        <aside class="sheet-sidebar" data-reveal>
+          <div class="card">
+            <div class="tag-row"><span class="tag">Google Sheet pública</span></div>
+            <h3>Arquitectura pensada para datos reales</h3>
+            <p>La web puede consumir una hoja pública usando la API de Google Sheets o una conversión a JSON desde un endpoint ligero.</p>
+            <div class="sheet-status" style="margin-top:.85rem;"><span class="status-dot"></span><span>Estructura propuesta lista para implementación</span></div>
+          </div>
+          <div class="card">
+            <h3>Pestañas sugeridas</h3>
+            <p><strong>config</strong>, <strong>campanas</strong>, <strong>actividades</strong>, <strong>comunicados</strong>, <strong>recursos</strong>, <strong>rutas</strong>, <strong>normatividad</strong>, <strong>equipo</strong>.</p>
+          </div>
+        </aside>
+
+        <div class="card" data-reveal>
+          <div class="section-head" style="margin-bottom:.8rem;">
+            <div><h2>Implementación base para Google Sheets</h2></div>
+          </div>
+          <p>Se recomienda mapear cada pestaña a una colección independiente. Esto facilita filtrar por audiencia, por campaña, por fecha o por destacado, y permite que la institución actualice el sitio sin tocar el código.[web:31][web:37]</p>
+          <div class="code-block">const SHEET_CONFIG = {
+  spreadsheetId: 'TU_SPREADSHEET_ID',
+  apiKey: 'TU_API_KEY',
+  tabs: {
+    config: 'config!A:Z',
+    campanas: 'campanas!A:Z',
+    actividades: 'actividades!A:Z',
+    comunicados: 'comunicados!A:Z',
+    recursos: 'recursos!A:Z',
+    rutas: 'rutas!A:Z',
+    normatividad: 'normatividad!A:Z',
+    equipo: 'equipo!A:Z'
+  }
+};
+
+async function fetchSheet(range) {
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_CONFIG.spreadsheetId}/values/${range}?key=${SHEET_CONFIG.apiKey}`;
+  const res = await fetch(url);
+  const data = await res.json();
+  return rowsToObjects(data.values || []);
+}
+
+function rowsToObjects(rows) {
+  if (!rows.length) return [];
+  const headers = rows[0].map(h => slugify(h));
+  return rows.slice(1).map(row => Object.fromEntries(headers.map((h, i) => [h, row[i] ?? ''])));
+}</div>
+          <div class="faq" style="margin-top:1rem;">
+            <details open>
+              <summary>¿Qué mostrar primero en la home?</summary>
+              <p>Campañas destacadas, próximas actividades, últimos comunicados y recursos filtrados por audiencia o por sección.</p>
+            </details>
+            <details>
+              <summary>¿Qué conviene hacer en local?</summary>
+              <p>Desarrollar con datos mock JSON, luego conectar la hoja y dejar fallback si la API no responde o si la hoja aún no es pública.</p>
+            </details>
+            <details>
+              <summary>¿Cómo mejorar el rendimiento?</summary>
+              <p>Cargar primero configuración y destacados, y diferir colecciones secundarias; además, cachear respuestas si luego se migra a un framework estático.</p>
+            </details>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer" id="contacto">
+    <div class="container">
+      <div class="card footer-card" data-reveal>
+        <div>
+          <h2>Versión 2: más simbólica, más medida y más lista para producción.</h2>
+          <p>Este archivo conserva la dirección emocional del proyecto, mejora la primera impresión visual y deja una base clara para conectar campañas, actividades, comunicados y recursos desde una Google Sheet pública.[web:31][web:37]</p>
+        </div>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="https://wa.me/573214637057" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+          <a class="btn btn-secondary" href="mailto:orientacionescolar@normalsuperiormonterrey.com">Correo</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      const root = document.documentElement;
+      const toggle = document.querySelector('[data-theme-toggle]');
+      const menuToggle = document.getElementById('menuToggle');
+      const navLinks = document.getElementById('navLinks');
+
+      let theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      root.setAttribute('data-theme', theme);
+
+      function updateThemeIcon() {
+        toggle.innerHTML = theme === 'dark'
+          ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>'
+          : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>';
+      }
+      updateThemeIcon();
+
+      toggle.addEventListener('click', () => {
+        theme = theme === 'dark' ? 'light' : 'dark';
+        root.setAttribute('data-theme', theme);
+        updateThemeIcon();
+      });
+
+      menuToggle.addEventListener('click', () => navLinks.classList.toggle('open'));
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) entry.target.classList.add('is-visible');
+        });
+      }, { threshold: 0.12 });
+
+      document.querySelectorAll('[data-reveal]').forEach(el => observer.observe(el));
+
+      const SHEET_CONFIG = {
+        spreadsheetId: 'TU_SPREADSHEET_ID',
+        apiKey: 'TU_API_KEY',
+        tabs: {
+          config: 'config!A:Z',
+          campanas: 'campanas!A:Z',
+          actividades: 'actividades!A:Z',
+          comunicados: 'comunicados!A:Z',
+          recursos: 'recursos!A:Z',
+          rutas: 'rutas!A:Z',
+          normatividad: 'normatividad!A:Z',
+          equipo: 'equipo!A:Z'
+        }
+      };
+
+      function slugify(value) {
+        return String(value || '')
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .toLowerCase()
+          .trim()
+          .replace(/[^a-z0-9]+/g, '_')
+          .replace(/^_|_$/g, '');
+      }
+
+      function rowsToObjects(rows) {
+        if (!rows || !rows.length) return [];
+        const headers = rows[0].map(slugify);
+        return rows.slice(1).map(row => Object.fromEntries(headers.map((h, i) => [h, row[i] ?? ''])));
+      }
+
+      async function fetchSheetRange(range) {
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_CONFIG.spreadsheetId}/values/${range}?key=${SHEET_CONFIG.apiKey}`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('No se pudo cargar la hoja');
+        const data = await res.json();
+        return rowsToObjects(data.values || []);
+      }
+
+      async function loadPublicData() {
+        if (SHEET_CONFIG.spreadsheetId === 'TU_SPREADSHEET_ID') return;
+        try {
+          const [campanas, actividades] = await Promise.all([
+            fetchSheetRange(SHEET_CONFIG.tabs.campanas),
+            fetchSheetRange(SHEET_CONFIG.tabs.actividades)
+          ]);
+          renderCampaigns(campanas);
+          renderActivities(actividades);
+        } catch (error) {
+          console.warn('Usando datos mock locales.', error);
+        }
+      }
+
+      function renderCampaigns(items) {
+        const grid = document.getElementById('campaignsGrid');
+        if (!grid || !items.length) return;
+        grid.innerHTML = items
+          .filter(item => String(item.activa || item.visible || 'si').toLowerCase() !== 'no')
+          .sort((a, b) => Number(a.orden || 999) - Number(b.orden || 999))
+          .slice(0, 3)
+          .map(item => `
+            <article class="card campaign-card" data-reveal>
+              <div class="tag-row">
+                <span class="tag">${item.nombre || 'Campaña'}</span>
+                <span class="tag">${item.periodo || 'Activa'}</span>
+              </div>
+              <h3>${item.subtitulo || item.nombre || 'Campaña institucional'}</h3>
+              <p>${item.descripcion_corta || item.descripcion_larga || 'Contenido cargado desde Google Sheets.'}</p>
+              <a class="link-inline" href="#datos">Cargado desde hoja</a>
+            </article>
+          `).join('');
+        document.querySelectorAll('[data-reveal]').forEach(el => observer.observe(el));
+      }
+
+      function formatDateLabel(value) {
+        if (!value) return { day: '--', month: '---' };
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return { day: '--', month: '---' };
+        return {
+          day: String(date.getDate()).padStart(2, '0'),
+          month: date.toLocaleDateString('es-CO', { month: 'short' }).replace('.', '')
+        };
+      }
+
+      function renderActivities(items) {
+        const list = document.getElementById('activitiesList');
+        if (!list || !items.length) return;
+        list.innerHTML = items
+          .sort((a, b) => Number(a.orden || 999) - Number(b.orden || 999))
+          .slice(0, 4)
+          .map(item => {
+            const date = formatDateLabel(item.fecha);
+            return `
+              <article class="agenda-item">
+                <div class="date-chip">${date.day}<span>${date.month}</span></div>
+                <div>
+                  <strong>${item.titulo || 'Actividad'}</strong>
+                  <p>${item.resumen || item.descripcion || 'Actividad cargada desde Google Sheets.'}</p>
+                  <div class="agenda-meta">
+                    <span>${item.publico || 'Comunidad educativa'}</span>
+                    <span>${item.lugar || 'Lugar por definir'}</span>
+                    <span>${item.estado || 'Programada'}</span>
+                  </div>
+                </div>
+                <span class="tag">${item.destacado || 'Dato'}</span>
+              </article>
+            `;
+          }).join('');
+      }
+
+      loadPublicData();
+    })();
+  </script>
+</body>
+</html>
