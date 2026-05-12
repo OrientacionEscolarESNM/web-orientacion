@@ -69,6 +69,10 @@ class SonariaRadioOrientacion {
             this.isPlaying = true;
             document.getElementById('radio-icon').textContent = "||";
             document.getElementById('radio-beacon').classList.add('spinning');
+            
+            // Toggle disk animation if present
+            document.querySelectorAll('.disk-sonaria').forEach(d => d.classList.add('spinning'));
+            
             this.showStatus('Sintonizado ✓');
             this.startWatchdog();
             this.stopEmergency();
@@ -125,6 +129,10 @@ class SonariaRadioOrientacion {
         }
         document.getElementById('radio-icon').textContent = "▶";
         document.getElementById('radio-beacon').classList.remove('spinning');
+        
+        // Stop disk animation
+        document.querySelectorAll('.disk-sonaria').forEach(d => d.classList.remove('spinning'));
+        
         this.showStatus('Pausado');
         this.stopEmergency();
     }
