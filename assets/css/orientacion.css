@@ -3,7 +3,7 @@
  * Enfoque: Editorial, Humano, Institucional y Accesible.
  */
 
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap');
+/* Fuentes cargadas desde <link> en el HTML para evitar bloqueo de renderizado */
 
 :root {
     /* Color Palette - Nature & Trust */
@@ -379,9 +379,6 @@ section {
     font-size: 0.95rem;
     color: var(--clr-text);
     line-height: 1.3;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .recurso-action {
