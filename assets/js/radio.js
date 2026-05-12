@@ -18,9 +18,13 @@ class SonariaRadioOrientacion {
         this.lastDataTime = 0;
         this.connectionStartTime = 0;
         
-        // Audio de emergencia (ubicado en el root)
+        // Audios de emergencia alternados
         this.emergencyAudio = null;
-        this.emergencyUrl = 'assets/audio/emergencia.mp3';
+        this.emergencyUrls = [
+            'assets/audio/emergencia1.mp3',
+            'assets/audio/emergencia2.mp3'
+        ];
+        this.currentEmergencyIndex = 0;
 
         this.createPlayerUI();
         this.initListeners();
@@ -140,10 +144,19 @@ class SonariaRadioOrientacion {
     startEmergency() {
         if (!this.userWantsPlay) return;
         if (!this.emergencyAudio) {
-            this.emergencyAudio = new Audio(this.emergencyUrl);
-            this.emergencyAudio.loop = true;
+            this.emergencyAudio = new Audio();
+            // Al terminar uno, pasar al siguiente
+            this.emergencyAudio.addEventListener('ended', () => {
+                this.currentEmergencyIndex = (this.currentEmergencyIndex + 1) % this.emergencyUrls.length;
+                this.emergencyAudio.src = this.emergencyUrls[this.currentEmergencyIndex];
+                this.emergencyAudio.play().catch(() => {});
+            });
         }
-        this.emergencyAudio.play().catch(() => {});
+        
+        if (this.emergencyAudio.paused) {
+            this.emergencyAudio.src = this.emergencyUrls[this.currentEmergencyIndex];
+            this.emergencyAudio.play().catch(() => {});
+        }
     }
 
     stopEmergency() {
@@ -161,8 +174,8 @@ class SonariaRadioOrientacion {
             if (this.userWantsPlay && this.isPlaying && now - this.lastDataTime > 15000) {
                 this.scheduleReconnect("Señal perdida");
             }
-            // Caso 2: Estamos intentando conectar pero no inicia (> 5s)
-            if (this.userWantsPlay && !this.isPlaying && now - this.connectionStartTime > 5000) {
+            // Caso 2: Estamos intentando conectar pero no inicia (> 2s)
+            if (this.userWantsPlay && !this.isPlaying && now - this.connectionStartTime > 2000) {
                 this.scheduleReconnect("Fallo de conexión");
             }
         }, 5000);

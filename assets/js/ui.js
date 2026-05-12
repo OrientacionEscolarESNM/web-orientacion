@@ -28,8 +28,8 @@ function initAnimations() {
 
         sr.reveal('.hero-content > *');
         sr.reveal('.hero-visual', { origin: 'right', distance: '40px' });
-        sr.reveal('.card');
-        sr.reveal('.section-header');
+        sr.reveal('.card:not(.no-reveal)');
+        // Quitamos reveal de .section-header para que los títulos aparezcan al instante
     }
 }
 
