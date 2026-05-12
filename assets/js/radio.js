@@ -174,11 +174,11 @@ class SonariaRadioOrientacion {
             if (this.userWantsPlay && this.isPlaying && now - this.lastDataTime > 15000) {
                 this.scheduleReconnect("Señal perdida");
             }
-            // Caso 2: Estamos intentando conectar pero no inicia (> 2s)
+            // Caso 2: Intentando conectar pero no responde (> 2s) → emergencia inmediata
             if (this.userWantsPlay && !this.isPlaying && now - this.connectionStartTime > 2000) {
                 this.scheduleReconnect("Fallo de conexión");
             }
-        }, 5000);
+        }, 500); // Verificar cada 500ms para respetar el umbral de 2s
     }
 
     stopWatchdog() {
