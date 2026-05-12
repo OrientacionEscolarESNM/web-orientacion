@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Muro de Evidencias | Orientación Escolar ENSM</title>
+    <meta name="description" content="Galería de evidencias de las familias que participan en los retos pedagógicos de Orientación Escolar de la Escuela Normal Superior de Monterrey.">
+
+    <!-- Design System & Fonts -->
+    <link rel="stylesheet" href="assets/css/orientacion.css">
+
+    <!-- Iconify -->
+    <script src="https://code.iconify.design/iconify-icon/1.0.8/iconify-icon.min.js"></script>
+
+    <style>
+        .muro-hero {
+            background: linear-gradient(135deg, #050d0c 0%, var(--clr-primary) 100%);
+            padding: 6rem 1rem 4rem;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .muro-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 30% 70%, rgba(93, 185, 177, 0.15) 0%, transparent 60%),
+                        radial-gradient(circle at 70% 30%, rgba(186, 124, 86, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .muro-hero h1 {
+            color: white;
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            margin-bottom: 1rem;
+        }
+
+        .muro-hero h1 em {
+            color: #5db9b1;
+            font-style: italic;
+        }
+
+        .muro-hero p {
+            color: rgba(255,255,255,0.7);
+            max-width: 550px;
+            margin: 0 auto;
+            font-size: 1.05rem;
+        }
+
+        .muro-counter {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.15);
+            padding: 0.8rem 1.5rem;
+            border-radius: 99px;
+            font-weight: 700;
+            font-size: 1rem;
+            margin-top: 1.5rem;
+            color: white;
+        }
+
+        .muro-counter .emoji { font-size: 1.3rem; }
+
+        .muro-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+            padding: 2rem 1rem 0;
+        }
+
+        .muro-filter-btn {
+            padding: 0.6rem 1.5rem;
+            border-radius: 99px;
+            border: 1px solid var(--clr-primary);
+            color: var(--clr-primary);
+            background: transparent;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .muro-filter-btn:hover {
+            background: rgba(26, 77, 74, 0.05);
+        }
+
+        .muro-filter-btn.active {
+            background: var(--clr-primary);
+            color: white;
+            box-shadow: 0 4px 10px rgba(26, 77, 74, 0.2);
+        }
+
+        .muro-main {
+            padding: 2rem 0 4rem;
+            background: var(--clr-bg);
+            min-height: 60vh;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--clr-primary);
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+            transition: 0.3s;
+        }
+
+        .back-link:hover {
+            transform: translateX(-4px);
+            color: var(--clr-primary-light);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 1rem;
+            color: var(--clr-text-muted);
+        }
+
+        .empty-state .emoji { font-size: 3rem; margin-bottom: 1rem; }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="site-header">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">
+                    <img src="assets/img/escudo-norma.jpeg" alt="Escudo ENSM">
+                </div>
+                <div class="logo-text">
+                    <h1>Orientación Escolar</h1>
+                    <span>Escuela Normal Superior de Monterrey</span>
+                </div>
+            </a>
+            <nav class="nav-links">
+                <a href="index.html">Inicio</a>
+                <a href="index.html#agenda">Agenda</a>
+                <a href="index.html#recursos">Recursos</a>
+                <a href="programas.html">Programas</a>
+                <a href="index.html#rutas">Rutas</a>
+                <a href="index.html#contacto">Contacto</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero del Muro -->
+    <section class="muro-hero">
+        <h1 class="font-display">Muro de <em>Evidencias</em></h1>
+        <p>Las familias de nuestra comunidad educativa comparten sus experiencias al completar los retos pedagógicos.</p>
+        <div class="muro-counter" id="muro-counter" style="display: none;">
+            <span class="emoji">🎉</span>
+            <span id="counter-text">Cargando...</span>
+        </div>
+    </section>
+
+    <!-- Filtros -->
+    <div class="container muro-filters" id="muro-filters">
+        <button class="muro-filter-btn active" data-filter="all">Todos</button>
+    </div>
+
+    <!-- Grid completo -->
+    <section class="muro-main">
+        <div class="container">
+            <a href="index.html" class="back-link">← Volver al inicio</a>
+            <div id="muro-grid" class="masonry-grid">
+                <p style="text-align: center; color: var(--clr-text-muted); width: 100%;">Cargando evidencias...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container footer-content">
+            <div class="footer-logo">
+                <h4>Orientación Escolar</h4>
+                <p>Acompañamos el desarrollo integral de la Escuela Normal Superior de Monterrey.</p>
+            </div>
+            <div class="footer-links">
+                <h5>Navegación</h5>
+                <ul>
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="index.html#area">El Área</a></li>
+                    <li><a href="index.html#agenda">Agenda</a></li>
+                    <li><a href="programas.html">Programas</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h5>Contacto</h5>
+                <ul>
+                    <li>WhatsApp: 321 463 7057</li>
+                    <li>orientacionescolar@normalsuperiormonterrey.com</li>
+                    <li>Monterrey, Casanare</li>
+                </ul>
+            </div>
+        </div>
+        <div class="container copyright">
+            &copy; 2026 Escuela Normal Superior de Monterrey. Todos los derechos reservados.
+        </div>
+    </footer>
+
+    <!-- Logic -->
+    <script src="assets/js/data.js"></script>
+    <script>
+        // Reutilizar la función de renderizado sin importar todo ui.js
+        function renderMuroCard(item) {
+            const div = document.createElement('div');
+            div.className = 'evidencia-card';
+            div.dataset.grado = (item.grado || '').trim().toLowerCase();
+            
+            let mediaHtml = '';
+            if (item.url) {
+                if (item.url.includes('/video/upload/') || item.url.endsWith('.mp4') || item.url.endsWith('.webm')) {
+                    mediaHtml = `<video src="${item.url}" controls preload="metadata" style="width: 100%; display: block; border-radius: var(--radius-sm); outline: none;"></video>`;
+                } else {
+                    mediaHtml = `<img src="${item.url}" alt="Evidencia de la comunidad" loading="lazy" style="width: 100%; display: block; border-radius: var(--radius-sm);">`;
+                }
+            }
+
+            const nombreStr = item.nombre || item.nombre_padre || 'Familia ENSM';
+            const gradoStr = item.grado ? `<span class="evidencia-badge">${item.grado}</span>` : '';
+            const mensajeStr = item.mensaje ? `<p class="evidencia-msg">"${item.mensaje}"</p>` : '';
+            const fechaStr = item.fecha ? `<span style="font-size: 0.75rem; color: var(--clr-text-muted); display: block; margin-top: 0.5rem;">${item.fecha}</span>` : '';
+
+            div.innerHTML = `
+                ${mediaHtml}
+                <div class="evidencia-info">
+                    <div class="evidencia-header">
+                        <h5>${nombreStr}</h5>
+                        ${gradoStr}
+                    </div>
+                    ${mensajeStr}
+                    ${fechaStr}
+                </div>
+            `;
+            return div;
+        }
+
+        let allEvidencias = [];
+
+        async function initMuro() {
+            const grid = document.getElementById('muro-grid');
+            const counterContainer = document.getElementById('muro-counter');
+            const counterText = document.getElementById('counter-text');
+            const filtersContainer = document.getElementById('muro-filters');
+
+            try {
+                allEvidencias = await getEvidencias();
+            } catch (e) {
+                console.error('Error cargando evidencias:', e);
+                allEvidencias = [];
+            }
+
+            if (allEvidencias.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state" style="width: 100%;">
+                        <div class="emoji">🌱</div>
+                        <h3 style="color: var(--clr-primary); margin-bottom: 0.5rem;">Aún no hay evidencias</h3>
+                        <p>¡Gira la ruleta en la página principal, acepta un reto y sé el primero en inspirar a la comunidad!</p>
+                        <a href="index.html#ruleta" class="btn btn-primary" style="margin-top: 1.5rem;">Ir a la Ruleta</a>
+                    </div>
+                `;
+                return;
+            }
+
+            // Mostrar contador
+            counterText.textContent = `${allEvidencias.length} familia${allEvidencias.length > 1 ? 's han' : ' ha'} participado`;
+            counterContainer.style.display = 'inline-flex';
+
+            // Generar filtros dinámicos por grado
+            const grados = [...new Set(allEvidencias.map(e => (e.grado || '').trim()).filter(g => g))];
+            grados.sort();
+            grados.forEach(g => {
+                const btn = document.createElement('button');
+                btn.className = 'muro-filter-btn';
+                btn.dataset.filter = g.toLowerCase();
+                btn.textContent = g;
+                filtersContainer.appendChild(btn);
+            });
+
+            // Evento de filtros
+            filtersContainer.addEventListener('click', (e) => {
+                if (!e.target.classList.contains('muro-filter-btn')) return;
+                filtersContainer.querySelectorAll('.muro-filter-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                const filter = e.target.dataset.filter;
+                renderFiltered(filter);
+            });
+
+            renderFiltered('all');
+        }
+
+        function renderFiltered(filter) {
+            const grid = document.getElementById('muro-grid');
+            grid.innerHTML = '';
+
+            const filtered = filter === 'all' 
+                ? allEvidencias 
+                : allEvidencias.filter(e => (e.grado || '').trim().toLowerCase() === filter);
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '<p style="text-align: center; color: var(--clr-text-muted); width: 100%; padding: 2rem;">No hay evidencias para este filtro.</p>';
+                return;
+            }
+
+            filtered.forEach(item => {
+                grid.appendChild(renderMuroCard(item));
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', initMuro);
+    </script>
+</body>
+</html>

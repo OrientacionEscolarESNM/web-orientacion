@@ -67,9 +67,20 @@ async function renderAll() {
         const normatividad = await getSheetData('normatividad');
         renderCollection('normatividad-container', normatividad, createNormaCard);
 
-        // Renderizar Muro de Evidencias
+        // Renderizar Muro de Evidencias (Preview: máx 6)
         const evidencias = await getEvidencias();
-        renderEvidenciasGrid('evidencias-container', evidencias);
+        renderEvidenciasGrid('evidencias-container', evidencias, 6);
+
+        // Mostrar contador y botón "Ver todo" si hay más de 6
+        const counterEl = document.getElementById('evidencias-counter');
+        const ctaEl = document.getElementById('evidencias-cta');
+        if (evidencias.length > 0 && counterEl) {
+            counterEl.textContent = `🎉 ${evidencias.length} familia${evidencias.length > 1 ? 's han' : ' ha'} participado`;
+            counterEl.style.display = 'block';
+        }
+        if (evidencias.length > 6 && ctaEl) {
+            ctaEl.style.display = 'block';
+        }
 
         // --- CARRUSEL GLOBAL (Highlights) ---
         // Se alimenta de Actividades, Recursos y Comunicados que tengan carrusel = SI
@@ -643,7 +654,7 @@ function observeTimelineItems(container) {
 }
 
 /* ==================== MURO DE EVIDENCIAS ==================== */
-function renderEvidenciasGrid(containerId, items) {
+function renderEvidenciasGrid(containerId, items, limit) {
     const container = document.getElementById(containerId);
     if (!container) return;
 
@@ -652,8 +663,11 @@ function renderEvidenciasGrid(containerId, items) {
         return;
     }
 
+    // Si hay límite, mostrar solo las más recientes
+    const displayItems = limit ? items.slice(0, limit) : items;
+
     container.innerHTML = '';
-    items.forEach(item => {
+    displayItems.forEach(item => {
         const div = document.createElement('div');
         div.className = 'evidencia-card';
         
