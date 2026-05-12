@@ -288,6 +288,14 @@ section {
     background-color: var(--clr-surface) !important;
 }
 
+/* Override para secciones que deben aparecer instantáneamente */
+.no-reveal {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+    transition: none !important;
+}
+
 .section-header {
     text-align: center;
     margin-bottom: 5rem;
