@@ -16,10 +16,11 @@ class SonariaRadioOrientacion {
         this.reconnectTimer = null;
         this.watchdogTimer = null;
         this.lastDataTime = 0;
+        this.connectionStartTime = 0;
         
         // Audio de emergencia (ubicado en el root)
         this.emergencyAudio = null;
-        this.emergencyUrl = '../assets/audio/emergencia.mp3';
+        this.emergencyUrl = 'assets/audio/emergencia.mp3';
 
         this.createPlayerUI();
         this.initListeners();
@@ -100,6 +101,8 @@ class SonariaRadioOrientacion {
     connectStream() {
         this.createAudio();
         this.showStatus('Buscando señal...');
+        this.connectionStartTime = Date.now();
+        this.startWatchdog();
         this.audio.src = this.streamUrl + '?nocache=' + Date.now();
         this.audio.play().catch(() => {
             if (this.userWantsPlay) this.scheduleReconnect("Reintentando");
@@ -153,8 +156,14 @@ class SonariaRadioOrientacion {
     startWatchdog() {
         this.stopWatchdog();
         this.watchdogTimer = setInterval(() => {
-            if (this.userWantsPlay && this.isPlaying && Date.now() - this.lastDataTime > 20000) {
+            const now = Date.now();
+            // Caso 1: Estaba sonando y se cortó el flujo de datos (> 15s)
+            if (this.userWantsPlay && this.isPlaying && now - this.lastDataTime > 15000) {
                 this.scheduleReconnect("Señal perdida");
+            }
+            // Caso 2: Estamos intentando conectar pero no inicia (> 10s)
+            if (this.userWantsPlay && !this.isPlaying && now - this.connectionStartTime > 10000) {
+                this.scheduleReconnect("Fallo de conexión");
             }
         }, 5000);
     }
