@@ -1,5 +1,6 @@
 // ==================================================
-// MOTOR DE TAREAS INTEGRAL - CHATBOT ADMINISTRADOR
+// MOTOR DE TAREAS - CHATBOT ADMINISTRADOR
+// Solo entidades funcionales: Actividad, Comunicado, Programa, Recurso
 // ==================================================
 
 const CHAT_STATES = {
@@ -9,105 +10,55 @@ const CHAT_STATES = {
 };
 
 const ENTIDADES = {
+  actividad: {
+    nombre: '🗓️ Actividad',
+    preguntas: [
+      { key: 'titulo', q: '¿Cómo se llama la **Actividad**?' },
+      { key: 'descripcion', q: 'Dame una breve **Descripción**.' },
+      { key: 'fecha', q: '¿Qué **Fecha** tiene?', inputType: 'date' },
+      { key: 'publico', q: '¿Para qué **Público** va? (Ej: Todos, Padres, Estudiantes)' },
+      { key: 'estado', q: '¿Cuál es su **Estado**? (próxima, activa, finalizada)' },
+      { key: 'programa_id', q: '¿A qué **Programa** pertenece? (Selecciona o escribe "No")', inputType: 'select' },
+      { key: 'imagen_carrusel', q: '¿Deseas adjuntar una **Imagen** para el carrusel? 📸 (Sube archivo o escribe "No")', upload: 'image' },
+      { key: 'destacado', q: '¿Es una actividad **Destacada**? ⭐ (Sí/No)' },
+      { key: 'visible', q: '¿Debe estar **Visible**? 👁️ (Sí/No)' }
+    ],
+    saveFunc: 'guardarActividad'
+  },
   comunicado: {
     nombre: '📢 Comunicado',
     preguntas: [
       { key: 'titulo', q: '¿Cuál es el **Título** del comunicado?' },
-      { key: 'resumen', q: 'Escribe un **Resumen breve** para la tarjeta.' },
-      { key: 'contenido_corto', q: 'Escribe el **Contenido principal** (texto corto).' },
-      { key: 'imagen_url', q: '¿Deseas adjuntar una **Imagen**? 📸', upload: 'image' },
-      { key: 'pdf_url', q: '¿Deseas adjuntar un **Documento PDF**? 📄', upload: 'pdf' },
+      { key: 'descripcion', q: 'Escribe la **Descripción** o resumen del comunicado.' },
+      { key: 'link', q: '¿Hay algún **Enlace** relacionado? 🔗 (Pega URL o escribe "No")' },
+      { key: 'imagen_portada', q: '¿Deseas adjuntar una **Imagen de portada**? 📸 (Sube archivo o escribe "No")', upload: 'image' },
       { key: 'destacado', q: '¿Es un comunicado **Destacado**? ⭐ (Sí/No)' },
       { key: 'visible', q: '¿Debe estar **Visible** ahora? 👁️ (Sí/No)' }
     ],
     saveFunc: 'guardarComunicado'
   },
-  actividad: {
-    nombre: '🗓️ Actividad / Gestión',
+  programa: {
+    nombre: '🚩 Programa',
     preguntas: [
-      { key: 'titulo', q: '¿Cómo se llama la **Actividad**?' },
-      { key: 'fecha', q: '¿Qué **Fecha** tuvo?', inputType: 'date' },
-      { key: 'descripcion', q: 'Dame una breve **Descripción**.' },
-      { key: 'grados', q: '¿Para qué **Grados** fue? (Ej: Todos, o 1,2,3)' },
-      { key: 'responsables', q: '¿Quiénes fueron los **Responsables**?' },
-      { key: 'estado', q: '¿Cuál es su **Estado**? (activa, programada, finalizada)' },
-      { key: 'categoria', q: '¿En qué **Categoría** entra? (gestion, cultural, deportiva)' },
-      { key: 'destacado', q: '¿Es una actividad **Destacada**? ⭐ (Sí/No)' },
-      { key: 'enlace', q: '¿Hay algún **Enlace** relacionado? 🔗 (URL o No)' }
+      { key: 'nombre', q: '¿Cuál es el **Nombre** del programa?' },
+      { key: 'subtitulo', q: '¿Cuál es el **Subtítulo** o frase corta? (o escribe "No")' },
+      { key: 'descripcion', q: 'Escribe la **Descripción** completa del programa.' },
+      { key: 'imagen_url', q: '¿Deseas adjuntar una **Imagen de portada**? 📸 (Sube archivo o escribe "No")', upload: 'image' }
     ],
-    saveFunc: 'guardarActividad'
-  },
-  campana: {
-    nombre: '🚩 Campaña',
-    preguntas: [
-      { key: 'nombre', q: '¿Nombre de la **Campaña**?' },
-      { key: 'subtitulo', q: '¿Cuál es el **Subtítulo** o frase corta?' },
-      { key: 'descripcion', q: 'Escribe la **Descripción** completa.' },
-      { key: 'estado', q: '¿Cuál es el **Estado**? (activa, inactiva)' },
-      { key: 'imagen_url', q: 'Sube la **Imagen de portada** 📸', upload: 'image' },
-      { key: 'visible', q: '¿Debe estar **Visible**? 👁️ (Sí/No)' }
-    ],
-    saveFunc: 'guardarCampana'
-  },
-    multimedia: {
-    nombre: '🎥 Multimedia (Video/Foto)',
-    preguntas: [
-      { key: 'titulo', q: '¿Título del recurso **Multimedia**?' },
-      { key: 'descripcion', q: 'Breve **Descripción**.' },
-      { key: 'campana', q: '¿A qué **Campaña** pertenece?', inputType: 'select' },
-      { key: 'fecha', q: '¿Qué **Fecha** tiene?', inputType: 'date' },
-      { key: 'video_url', q: 'Pega la **URL de YouTube** o sube una **Imagen/Video** 📸', upload: 'image' },
-      { key: 'miniatura_url', q: 'Si pegaste un video, pega la **URL de miniatura**. Si subiste imagen, escribe No.' },
-      { key: 'visible', q: '¿Debe estar **Visible**? 👁️ (Sí/No)' }
-    ],
-    saveFunc: 'guardarVideo'
-  },
-  juego: {
-    nombre: '🎮 Juego / Actividad Interactiva',
-    preguntas: [
-      { key: 'titulo', q: '¿Título del **Juego**?' },
-      { key: 'descripcion', q: 'Breve **Descripción**.' },
-      { key: 'juego_url', q: 'Pega la **URL del Juego** (Educaplay, Wordwall, etc.).' },
-      { key: 'campana', q: '¿A qué **Campaña** pertenece?', inputType: 'select' },
-      { key: 'visible', q: '¿Debe estar **Visible**? 👁️ (Sí/No)' }
-    ],
-    saveFunc: 'guardarJuego'
+    saveFunc: 'guardarPrograma'
   },
   recurso: {
-    nombre: '📂 Recurso / Descargable',
+    nombre: '📂 Recurso',
     preguntas: [
       { key: 'titulo', q: '¿Título del **Recurso**?' },
-      { key: 'tipo', q: '¿Qué **Tipo** de recurso es? (pdf, enlace, imagen)' },
-      { key: 'descripcion', q: 'Breve **Descripción**.' },
-      { key: 'url', q: 'Sube el **Archivo** 📄 o pega la **URL**.', upload: 'pdf' },
-      { key: 'categoria', q: '¿A qué **Campaña** pertenece?', inputType: 'select' },
+      { key: 'tipo', q: '¿Qué **Tipo** de recurso es? (Documento, Enlace, Imagen, Video)' },
+      { key: 'audiencia', q: '¿Para qué **Audiencia** va? (Todos, Padres, Docentes, Estudiantes)' },
+      { key: 'link', q: 'Sube el **Archivo** 📄 o pega la **URL del recurso**.', upload: 'pdf' },
+      { key: 'id_actividad', q: '¿Está relacionado a alguna **Actividad**? (Selecciona o escribe "No")', inputType: 'select' },
+      { key: 'destacado', q: '¿Es un recurso **Destacado**? ⭐ (Sí/No)' },
       { key: 'visible', q: '¿Debe estar **Visible**? 👁️ (Sí/No)' }
     ],
     saveFunc: 'guardarRecurso'
-  },
-  tema: {
-    nombre: '📖 Tema del Manual',
-    preguntas: [
-      { key: 'titulo', q: '¿Título del **Tema** del manual?' },
-      { key: 'resumen', q: 'Escribe un **Resumen** corto.' },
-      { key: 'categoria', q: '¿En qué **Categoría** va? (convivencia, deberes, etc.)' },
-      { key: 'imagen_url', q: 'Sube la **Imagen de cabecera** 📸', upload: 'image' },
-      { key: 'recurso_principal', q: '¿ID del **Recurso** asociado? (Ej: rec-001 o No)' },
-      { key: 'visible', q: '¿Debe estar **Visible**? 👁️ (Sí/No)' }
-    ],
-    saveFunc: 'guardarTema'
-  },
-  bloque: {
-    nombre: '🧱 Bloque de Contenido',
-    preguntas: [
-      { key: 'tema_id', q: '¿A qué **ID de Tema** pertenece? (Ej: tm-001)' },
-      { key: 'tipo_bloque', q: '¿Qué **Tipo de bloque** es? (texto, video, imagen, recurso, actividad)' },
-      { key: 'titulo_bloque', q: '¿Qué **Título** lleva el bloque? (Opcional)' },
-      { key: 'contenido', q: 'Escribe el **Contenido** del bloque.' },
-      { key: 'orden', q: '¿Qué número de **Orden** tiene?' },
-      { key: 'visible', q: '¿Debe estar **Visible**? 👁️ (Sí/No)' }
-    ],
-    saveFunc: 'guardarBloque'
   }
 };
 
@@ -117,11 +68,14 @@ function procesarMensajeChat(mensaje, context) {
 
   // Comando cancelar
   if (mensaje.toLowerCase().includes('cancelar') || mensaje.toLowerCase() === 'inicio') {
-    return { respuesta: "Proceso cancelado. ¿Qué deseas gestionar ahora? Escribe: **Comunicado, Actividad, Campaña, Multimedia, Juego, Recurso, Tema o Bloque**.", state: CHAT_STATES.IDLE, data: {} };
+    return {
+      respuesta: "Proceso cancelado. ¿Qué deseas gestionar ahora?\n\nEscribe: **Actividad, Comunicado, Programa o Recurso**.",
+      state: CHAT_STATES.IDLE,
+      data: {}
+    };
   }
 
-  // --- LÓGICA DE ESTADOS ---
-
+  // --- ESTADO IDLE: Detectar qué entidad quiere gestionar ---
   if (state === CHAT_STATES.IDLE) {
     const msgLower = mensaje.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     for (let key in ENTIDADES) {
@@ -130,7 +84,7 @@ function procesarMensajeChat(mensaje, context) {
         context.step = 0;
         const pregunta = ENTIDADES[key].preguntas[0];
         return {
-          respuesta: "¡Entendido! Vamos a gestionar: **" + ENTIDADES[key].nombre + "**. \n\n" + pregunta.q,
+          respuesta: "¡Entendido! Vamos a crear: **" + ENTIDADES[key].nombre + "**.\n\n" + pregunta.q,
           state: CHAT_STATES.ASKING,
           step: 0,
           entidad: key,
@@ -142,22 +96,22 @@ function procesarMensajeChat(mensaje, context) {
       }
     }
     return {
-      respuesta: "Hola. ¿Qué deseas gestionar hoy? \n\nEscribe: **Comunicado, Actividad, Campaña, Multimedia, Juego, Recurso, Tema o Bloque**.",
+      respuesta: "¡Hola! ¿Qué deseas gestionar hoy?\n\nEscribe: **Actividad, Comunicado, Programa o Recurso**.",
       state: CHAT_STATES.IDLE
     };
   }
 
+  // --- ESTADO ASKING: Recopilar datos paso a paso ---
   if (state === CHAT_STATES.ASKING) {
     const entidad = ENTIDADES[context.entidad];
     const step = context.step;
     const preguntaActual = entidad.preguntas[step];
 
-    // Guardar respuesta anterior (si no se saltó por upload previo)
+    // Guardar la respuesta del usuario
     if (!context.data[preguntaActual.key]) {
       if (mensaje.toLowerCase() === 'no' || mensaje.toLowerCase() === 'n') {
-        // Si es subida de archivo, enlace o miniatura opcional, guardamos vacío.
-        // Si es una pregunta de Sí/No (como visible o destacado), guardamos la palabra "no".
-        if (preguntaActual.upload || preguntaActual.key === 'enlace' || preguntaActual.key === 'miniatura_url') {
+        // Para campos opcionales (uploads, enlaces), guardamos vacío
+        if (preguntaActual.upload || preguntaActual.key === 'link' || preguntaActual.key === 'subtitulo') {
           context.data[preguntaActual.key] = "";
         } else {
           context.data[preguntaActual.key] = "no";
@@ -171,22 +125,14 @@ function procesarMensajeChat(mensaje, context) {
     context.step++;
     if (context.step < entidad.preguntas.length) {
       let siguientePregunta = entidad.preguntas[context.step];
-      
-      // AUTO-SKIP: Si es miniatura_url y ya tenemos video_url de Cloudinary, saltar.
-      if (siguientePregunta.key === 'miniatura_url' && context.data.video_url && context.data.video_url.includes('cloudinary')) {
-          context.data.miniatura_url = "no";
-          context.step++;
-          if (context.step < entidad.preguntas.length) {
-            siguientePregunta = entidad.preguntas[context.step];
-          } else {
-            return finalizarTareaChat(context);
-          }
-      }
 
+      // Cargar opciones dinámicas para selects
       let options = null;
       if (siguientePregunta.inputType === 'select') {
-        if (siguientePregunta.key === 'campana' || siguientePregunta.key === 'categoria') {
-          options = obtenerListaCampanas();
+        if (siguientePregunta.key === 'programa_id') {
+          options = obtenerListaProgramas();
+        } else if (siguientePregunta.key === 'id_actividad') {
+          options = obtenerListaActividades();
         }
       }
 
@@ -202,80 +148,80 @@ function procesarMensajeChat(mensaje, context) {
         options: options
       };
     } else {
-      // Hemos terminado todas las preguntas
+      // Todas las preguntas completadas → mostrar resumen
       return finalizarTareaChat(context);
     }
   }
 
+  // --- ESTADO CONFIRM: Guardar o cancelar ---
   if (state === CHAT_STATES.CONFIRM) {
-    if (mensaje.toLowerCase().includes('si') || mensaje.toLowerCase() === 'ok') {
+    if (mensaje.toLowerCase().includes('si') || mensaje.toLowerCase() === 'ok' || mensaje.toLowerCase() === 'sí') {
       const entidad = ENTIDADES[context.entidad];
-      
-            // Ajustes específicos antes de guardar
-      if (context.entidad === 'actividad') {
-        const d = new Date(context.data.fecha);
-        const m = d.getMonth() + 1;
-        let p = "Primer periodo";
-        if (m >= 4 && m <= 6) p = "Segundo periodo";
-        else if (m >= 7 && m <= 9) p = "Tercer periodo";
-        else if (m >= 10) p = "Cuarto periodo";
-        context.data.periodo = p;
-      }
-      if (context.entidad === 'comunicado') {
-        context.data.fecha = new Date().toISOString().split('T')[0];
-        if (context.data.imagen_url) {
-          context.data.miniatura_url = context.data.imagen_url.replace('/upload/', '/upload/w_400,c_fill/');
-        } else if (context.data.pdf_url) {
-          context.data.miniatura_url = 'https://res.cloudinary.com/denrgxzvw/image/upload/v1776666137/miniaturapdf_sjseyp.jpg';
-        }
-      }
-      if (context.entidad === 'multimedia') {
-        // Si la miniatura es automática (marcada como "no" por el skip logic)
-        if (!context.data.miniatura_url || context.data.miniatura_url.toLowerCase() === 'no') {
-          if (context.data.video_url && context.data.video_url.includes('cloudinary')) {
-            // Si es Cloudinary, generamos la miniatura transformando la URL
-            // Cambiamos /upload/ por transformaciones y nos aseguramos de que termine en .jpg
-            let baseUrl = context.data.video_url.split('?')[0]; // Limpiar query params si los hay
-            let thumb = baseUrl.replace('/upload/', '/upload/w_600,c_fill,g_auto,f_jpg/');
-            
-            // Si era un video (mp4, mov, etc), cambiamos la extensión a .jpg para que Cloudinary devuelva un frame
-            if (thumb.match(/\.(mp4|mov|avi|wmv|flv|webm)$/i)) {
-              thumb = thumb.replace(/\.[^.]+$/, '.jpg');
-            }
-            context.data.miniatura_url = thumb;
-          } else {
-            context.data.miniatura_url = "";
-          }
-        }
-      }
-      // La lógica de ID y enlace para Campaña ahora se maneja en el servidor (guardarCampana)
-      // para evitar errores de referencia y asegurar unicidad.
 
+      // Ajustes previos al guardado según entidad
+      if (context.entidad === 'actividad') {
+        // Normalizar campos para la función guardarActividad
+        if (context.data.destacado && context.data.destacado.toLowerCase().includes('si')) {
+          context.data.destacado = 'si';
+        } else {
+          context.data.destacado = 'no';
+        }
+        if (context.data.visible && context.data.visible.toLowerCase().includes('si')) {
+          context.data.visible = 'si';
+        } else {
+          context.data.visible = 'no';
+        }
+        // Determinar si va al carrusel (si tiene imagen)
+        context.data.carrusel = context.data.imagen_carrusel ? 'si' : 'no';
+      }
+
+      if (context.entidad === 'comunicado') {
+        // Fecha automática
+        context.data.fecha = new Date().toISOString().split('T')[0];
+        // Normalizar sí/no
+        context.data.destacado = (context.data.destacado || '').toLowerCase().includes('si') ? 'si' : 'no';
+        context.data.visible = (context.data.visible || '').toLowerCase().includes('si') ? 'si' : 'no';
+      }
+
+      if (context.entidad === 'programa') {
+        // Mapear imagen_url → imagen_portada para guardarPrograma
+        context.data.imagen_portada = context.data.imagen_url || '';
+      }
+
+      if (context.entidad === 'recurso') {
+        // Normalizar sí/no
+        context.data.destacado = (context.data.destacado || '').toLowerCase().includes('si') ? 'si' : 'no';
+        context.data.visible = (context.data.visible || '').toLowerCase().includes('si') ? 'si' : 'no';
+        context.data.carrusel = 'no';
+        context.data.imagen_carrusel = '';
+      }
+
+      // Ejecutar la función de guardado
       const fn = entidad.saveFunc;
       let resGuardar = { msg: '' };
       try {
-        if (fn === 'guardarComunicado') resGuardar = guardarComunicado(context.data);
-        else if (fn === 'guardarActividad') resGuardar = guardarActividad(context.data);
-        else if (fn === 'guardarCampana') resGuardar = guardarCampana(context.data);
-        else if (fn === 'guardarVideo') resGuardar = guardarVideo(context.data);
-        else if (fn === 'guardarJuego') resGuardar = guardarJuego(context.data);
+        if (fn === 'guardarActividad') resGuardar = guardarActividad(context.data);
+        else if (fn === 'guardarComunicado') resGuardar = guardarComunicado(context.data);
+        else if (fn === 'guardarPrograma') resGuardar = guardarPrograma(context.data);
         else if (fn === 'guardarRecurso') resGuardar = guardarRecurso(context.data);
-        else if (fn === 'guardarTema') resGuardar = guardarTema(context.data);
-        else if (fn === 'guardarBloque') resGuardar = guardarBloque(context.data);
       } catch (e) {
         return { respuesta: "❌ Error al guardar: " + e.message, state: CHAT_STATES.IDLE, data: {} };
       }
 
       return {
-        respuesta: "✅ **¡Guardado con éxito!**\n" + (resGuardar.msg || '') + "\n\n¿Deseas gestionar algo más?",
+        respuesta: "✅ **¡Guardado con éxito!**\n" + (resGuardar.msg || '') + "\n\n¿Deseas gestionar algo más? Escribe: **Actividad, Comunicado, Programa o Recurso**.",
         state: CHAT_STATES.IDLE,
         data: {}
       };
     }
-    return { respuesta: "Guardado cancelado. ¿Qué sigue?", state: CHAT_STATES.IDLE, data: {} };
+    return {
+      respuesta: "Guardado cancelado. ¿Qué deseas gestionar ahora?\n\nEscribe: **Actividad, Comunicado, Programa o Recurso**.",
+      state: CHAT_STATES.IDLE,
+      data: {}
+    };
   }
 
-  return { respuesta: "Lo siento, no entendí. Di 'Inicio' para volver al menú.", state: CHAT_STATES.IDLE };
+  return { respuesta: "No entendí tu mensaje. Escribe 'Inicio' para volver al menú.", state: CHAT_STATES.IDLE };
 }
 
 function finalizarTareaChat(context) {
@@ -284,11 +230,15 @@ function finalizarTareaChat(context) {
   
   for (let key in context.data) {
     let val = context.data[key];
-    if (val && val.length > 50) val = val.substring(0, 47) + "...";
-    resumen += "🔹 **" + key.toUpperCase() + "**: " + (val || '---') + "\n";
+    if (!val) continue; // No mostrar campos vacíos
+    if (val.length > 60) val = val.substring(0, 57) + "...";
+    
+    // Nombres legibles para las claves
+    let label = key.replace(/_/g, ' ').toUpperCase();
+    resumen += "🔹 **" + label + "**: " + val + "\n";
   }
   
-  resumen += "━━━━━━━━━━━━━━━━━━━━\n¿Confirmas que los datos son correctos? (Responde **SÍ**)";
+  resumen += "━━━━━━━━━━━━━━━━━━━━\n¿Los datos son correctos? (Responde **SÍ** para guardar o **No** para cancelar)";
   
   return {
     respuesta: resumen,
