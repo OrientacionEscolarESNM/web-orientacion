@@ -923,7 +923,10 @@ section {
 }
 
 .emisora-hero {
-    background: linear-gradient(135deg, var(--clr-sonaria-dark) 0%, var(--clr-primary) 100%);
+    background: linear-gradient(135deg, rgba(5, 13, 12, 0.8) 0%, rgba(26, 77, 74, 0.6) 100%), url('../img/fondo_1.gif');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
     padding: 10rem 1rem 8rem;
     position: relative;
     overflow: hidden;
