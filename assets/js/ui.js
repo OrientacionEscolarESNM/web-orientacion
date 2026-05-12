@@ -54,8 +54,12 @@ async function renderAll() {
         const actividades = await getSheetData('actividades');
         renderTimeline(actividades, 'agenda-container');
 
-        // Renderizar Recursos
-        window.allRecursos = await getSheetData('recursos');
+        // Renderizar Recursos (solo visibles)
+        const allRecursosRaw = await getSheetData('recursos');
+        window.allRecursos = allRecursosRaw.filter(r => {
+            const v = (r.visible || 'si').trim().toLowerCase();
+            return v === 'si' || v === 's' || v === 'yes' || v === 'y' || v === '';
+        });
         renderCollection('recursos-container', window.allRecursos, createResourceCard);
         initRecursosFilters();
 
@@ -139,31 +143,29 @@ function getRecursoIcon(tipo) {
 
 function createResourceCard(item) {
     const div = document.createElement('div');
-    div.className = 'card';
-    div.style.display = 'flex';
-    div.style.flexDirection = 'column';
-    div.style.alignItems = 'flex-start';
-    div.style.padding = '2rem';
+    div.className = 'recurso-card';
     
     const isDestacado = (item.destacado || '').toLowerCase() === 'si';
     if (isDestacado) {
-        div.style.borderTop = '4px solid var(--clr-accent)';
+        div.classList.add('recurso-destacado');
     }
     
     const icon = getRecursoIcon(item.tipo);
     const actionText = (item.tipo || '').toLowerCase().includes('video') ? 'Ver Video' : 'Acceder';
-    const destacadoBadge = isDestacado ? `<span class="tag" style="background: var(--clr-highlight); color: var(--clr-accent); font-weight: 700; font-size: 0.75rem; margin-bottom: 0.8rem; display: inline-block; margin-left: 0.5rem;">★ Destacado</span>` : '';
+    const destacadoBadge = isDestacado ? `<span class="recurso-star">★</span>` : '';
     
     div.innerHTML = `
-        <div style="background: var(--clr-highlight); color: var(--clr-primary); width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;">
+        <div class="recurso-icon">
             ${icon}
         </div>
-        <div style="margin-bottom: 1.5rem; flex-grow: 1; width: 100%;">
-            <span class="tag" style="background: var(--clr-bg); color: var(--clr-text-muted); font-size: 0.75rem; margin-bottom: 0.8rem; display: inline-block;">${item.audiencia || 'Comunidad'}</span>
-            ${destacadoBadge}
-            <h4 style="font-family: var(--font-body); font-weight: 700; font-size: 1.15rem; line-height: 1.4; color: var(--clr-text);">${item.titulo}</h4>
+        <div class="recurso-body">
+            <div class="recurso-meta">
+                <span class="recurso-tag">${item.audiencia || 'Comunidad'}</span>
+                ${destacadoBadge}
+            </div>
+            <h4 class="recurso-title">${item.titulo}</h4>
         </div>
-        <a href="${item.link || '#'}" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="width: 100%; text-align: center; font-size: 0.85rem; padding: 0.6rem; border-radius: 8px;">${actionText}</a>
+        <a href="${item.link || '#'}" target="_blank" rel="noopener noreferrer" class="recurso-action">${actionText} →</a>
     `;
     return div;
 }
