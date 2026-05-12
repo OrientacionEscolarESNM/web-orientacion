@@ -30,7 +30,7 @@
                 radial-gradient(at 50% 0%, hsla(174,45%,10%,1) 0, transparent 50%), 
                 radial-gradient(at 100% 0%, hsla(174,45%,15%,1) 0, transparent 50%), 
                 radial-gradient(at 50% 50%, hsla(174,45%,5%,1) 0, transparent 50%),
-                url('assets/img/fondo_1.gif');
+                url('assets/img/fondo_premium.gif');
             background-size: cover;
             background-position: center;
             background-blend-mode: overlay;
@@ -243,10 +243,24 @@
 
         .qr-glow {
             background: white;
-            padding: 2rem;
-            border-radius: 30px;
-            box-shadow: 0 0 40px rgba(93, 185, 177, 0.3);
+            padding: 1.5rem;
+            border-radius: 24px;
+            box-shadow: 0 0 50px rgba(93, 185, 177, 0.4);
             text-align: center;
+            width: 260px;
+            height: 260px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 4px solid rgba(255,255,255,0.1);
+        }
+
+        .qr-glow img {
+            width: 140%;
+            height: 140%;
+            object-fit: cover;
+            object-position: center 20%; /* Ajuste para centrar el QR y ocultar bordes blancos */
         }
 
         .btn-premium {
