@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <title>Nueva Actividad</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 16px; background: #f5f5f5; }
+    h2 { color: #1e3a5f; font-size: 16px; margin-bottom: 16px; }
+    label { display: block; font-size: 12px; font-weight: bold; color: #444; margin-bottom: 4px; margin-top: 10px; }
+    input, select, textarea { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; background: white; box-sizing: border-box; }
+    textarea { height: 70px; resize: vertical; }
+    .fila2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .btn { width: 100%; padding: 10px; background: #1e3a5f; color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: bold; margin-top: 14px; cursor: pointer; }
+    .btn:hover { background: #2d5a8f; }
+    .msg { padding: 8px; border-radius: 6px; font-size: 12px; margin-top: 8px; display: none; }
+    .ok { background: #d4edda; color: #155724; }
+    .err { background: #f8d7da; color: #721c24; }
+  </style>
+</head>
+<body>
+  <div style="margin-bottom: 15px;">
+    <button onclick="google.script.run.abrirAsistenteHome()" style="background: #eee; border: 1px solid #ccc; border-radius: 4px; color: #1e3a5f; cursor: pointer; font-size: 11px; padding: 4px 8px; font-weight: bold;">
+      🏠 Volver al Inicio
+    </button>
+  </div>
+
+  <h2>🗓️ Nueva Actividad</h2>
+
+  <div class="fila2">
+    <div>
+      <label>Título de la Actividad *</label>
+      <input type="text" id="titulo" placeholder="Ej: Taller de Emociones" onkeyup="generarSlug(this.value)">
+    </div>
+    <div>
+      <label>ID (Slug) *</label>
+      <input type="text" id="id" placeholder="taller-emociones">
+    </div>
+  </div>
+
+  <label>Descripción / Resumen</label>
+  <textarea id="descripcion" placeholder="Explica de qué trata la actividad..."></textarea>
+
+  <div class="fila2">
+    <div>
+      <label>Fecha *</label>
+      <input type="date" id="fecha">
+    </div>
+    <div>
+      <label>Público Objetivo</label>
+      <select id="publico">
+        <option value="Todos">Todos</option>
+        <option value="Estudiantes">Estudiantes</option>
+        <option value="Padres">Padres de Familia</option>
+        <option value="Docentes">Docentes</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="fila2">
+    <div>
+      <label>Programa Relacionado</label>
+      <select id="programa_id">
+        <option value="">-- Sin programa --</option>
+      </select>
+    </div>
+    <div>
+      <label>Estado</label>
+      <select id="estado">
+        <option value="próxima">Próxima</option>
+        <option value="en curso">En curso</option>
+        <option value="finalizada">Finalizada</option>
+        <option value="cancelada">Cancelada</option>
+      </select>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; background: #e8eaf6; padding: 10px; border-radius: 8px; margin-top: 10px;">
+    <div>
+      <label>¿Visible?</label>
+      <select id="visible">
+        <option value="si">Sí</option>
+        <option value="no">No</option>
+      </select>
+    </div>
+    <div>
+      <label>¿Destacado?</label>
+      <select id="destacado">
+        <option value="no">No</option>
+        <option value="si">Sí</option>
+      </select>
+    </div>
+    <div>
+      <label>¿Carrusel?</label>
+      <select id="carrusel">
+        <option value="no">No</option>
+        <option value="si">Sí</option>
+      </select>
+    </div>
+  </div>
+
+  <label>Imagen / Video (Carrusel)</label>
+  <div style="display: flex; gap: 8px;">
+    <input type="file" id="archivo-img" accept="image/*,video/*" style="flex: 1;">
+    <input type="hidden" id="imagen_carrusel">
+  </div>
+
+  <div id="msg" class="msg"></div>
+  <button class="btn" id="btn-save" onclick="guardar()">💾 Guardar Actividad</button>
+
+  <script>
+    window.onload = function() {
+      document.getElementById('fecha').value = new Date().toISOString().split('T')[0];
+      cargarProgramas();
+    };
+
+    function generarSlug(texto) {
+      var slug = texto.toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Quitar tildes
+        .replace(/[^\w ]+/g, '')
+        .replace(/ +/g, '-');
+      document.getElementById('id').value = slug;
+    }
+
+    function generarMiniaturaVideo(url) {
+      if (url.includes('/video/upload/')) {
+        return url.replace('/video/upload/', '/video/upload/w_600,c_fill,g_auto,f_jpg,so_auto/')
+                  .replace('.mp4', '.jpg')
+                  .replace('.webm', '.jpg')
+                  .replace('.mov', '.jpg');
+      }
+      return url;
+    }
+
+    function cargarProgramas() {
+      google.script.run.withSuccessHandler(function(programas) {
+        var select = document.getElementById('programa_id');
+        select.innerHTML = '<option value="">-- Seleccionar Programa --</option>';
+        programas.forEach(function(p) {
+          var opt = document.createElement('option');
+          opt.value = p.id;
+          opt.text = p.nombre;
+          select.appendChild(opt);
+        });
+      }).obtenerListaProgramas();
+    }
+
+    function guardar() {
+      var titulo = document.getElementById('titulo').value.trim();
+      var id = document.getElementById('id').value.trim();
+      if (!titulo || !id) { mostrar('err', '⚠️ Título e ID son obligatorios.'); return; }
+
+      var archivo = document.getElementById('archivo-img').files[0];
+      
+      if (archivo) {
+        mostrar('ok', '☁️ Subiendo multimedia a Cloudinary...');
+        subirImagenACloudinary(archivo, function(url) {
+          var thumbUrl = generarMiniaturaVideo(url);
+          document.getElementById('imagen_carrusel').value = thumbUrl;
+          guardarEnSheets(url);
+        });
+      } else {
+        guardarEnSheets('');
+      }
+    }
+
+    function guardarEnSheets(finalUrl) {
+      var data = {
+        id: document.getElementById('id').value,
+        titulo: document.getElementById('titulo').value,
+        descripcion: document.getElementById('descripcion').value,
+        fecha: document.getElementById('fecha').value,
+        publico: document.getElementById('publico').value,
+        destacado: document.getElementById('destacado').value,
+        estado: document.getElementById('estado').value,
+        visible: document.getElementById('visible').value,
+        carrusel: document.getElementById('carrusel').value,
+        programa_id: document.getElementById('programa_id').value,
+        imagen_carrusel: finalUrl || ''
+      };
+
+      mostrar('ok', '💾 Guardando en Sheets...');
+      google.script.run
+        .withSuccessHandler(function(r) {
+          mostrar('ok', '✅ ' + r.msg);
+          setTimeout(function() { google.script.run.abrirAsistenteHome(); }, 1500);
+        })
+        .withFailureHandler(function(e) {
+          mostrar('err', '❌ Error: ' + e.message);
+        })
+        .guardarActividad(data);
+    }
+
+    function subirArchivoADrive(archivo, callback) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var base64 = e.target.result.split(',')[1];
+        google.script.run
+          .withSuccessHandler(function(url) { callback(url); })
+          .subirPdfADriveGS({ base64: base64, name: archivo.name, type: archivo.type });
+      };
+      reader.readAsDataURL(archivo);
+    }
+
+    function subirImagenACloudinary(archivo, callback) {
+      var CLOUD_NAME = 'denrgxzvw';
+      var UPLOAD_PRESET = 'consejo-padres';
+      var formData = new FormData();
+      formData.append('file', archivo);
+      formData.append('upload_preset', UPLOAD_PRESET);
+      formData.append('folder', 'orientacion/actividades');
+
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', 'https://api.cloudinary.com/v1_1/' + CLOUD_NAME + '/auto/upload');
+      xhr.onload = function() {
+        if (xhr.status === 200) {
+          var res = JSON.parse(xhr.responseText);
+          callback(res.secure_url);
+        } else {
+          mostrar('err', '❌ Error al subir imagen.');
+        }
+      };
+      xhr.send(formData);
+    }
+
+    function mostrar(tipo, txt) {
+      var el = document.getElementById('msg');
+      el.className = 'msg ' + tipo;
+      el.innerText = txt;
+      el.style.display = 'block';
+    }
+  </script>
+</body>
+</html>

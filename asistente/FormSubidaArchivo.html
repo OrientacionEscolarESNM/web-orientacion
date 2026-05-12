@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <title>Subir Imagen/Archivo</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+    h2 { color: #1a237e; }
+    label { display: block; margin-top: 10px; font-weight: bold; }
+    input, select { width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+    button { margin-top: 16px; padding: 10px 24px; background: #1a237e; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    button:disabled { background: #aaa; }
+    #preview { max-width: 100%; margin-top: 10px; border-radius: 8px; display: none; }
+    #mensaje { margin-top: 12px; font-weight: bold; }
+    #urlResult { width: 100%; padding: 8px; margin-top: 8px; border: 1px solid #4caf50; border-radius: 4px; background: #e8f5e9; display: none; }
+  </style>
+</head>
+<body>
+  <div style="margin-bottom: 15px;">
+    <button onclick="google.script.run.abrirAsistenteHome()" style="background: #eee; border: 1px solid #ccc; border-radius: 4px; color: #1e3a5f; cursor: pointer; font-size: 11px; padding: 4px 8px; font-weight: bold;">
+      🏠 Volver al Inicio
+    </button>
+  </div>
+
+  <h2>☁️ Subir Imagen a Cloudinary</h2>
+  <label>Seleccionar imagen *</label>
+  <input type="file" id="archivo" accept="image/*" onchange="previsualizarImagen()">
+  <img id="preview" alt="Vista previa">
+  <label>Tipo / Carpeta</label>
+  <select id="carpeta">
+    <option value="actividades">Actividades</option>
+    <option value="comunicados">Comunicados</option>
+    <option value="recursos">Recursos</option>
+    <option value="manual">Manual</option>
+    <option value="general">General</option>
+  </select>
+  <button type="button" id="btnSubir" onclick="subirArchivo()">🚀 Subir a Cloudinary</button>
+  <div id="mensaje"></div>
+  <label id="lblUrl" style="display:none">URL de la imagen subida:</label>
+  <input type="text" id="urlResult" readonly onclick="this.select()">
+  <script>
+    var CLOUD_NAME = 'denrgxzvw';
+    var UPLOAD_PRESET = 'consejo-padres';
+
+    function previsualizarImagen() {
+      var file = document.getElementById('archivo').files[0];
+      if (file) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('preview').src = e.target.result;
+          document.getElementById('preview').style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function subirArchivo() {
+      var fileInput = document.getElementById('archivo');
+      var carpeta = document.getElementById('carpeta').value;
+      if (!fileInput.files[0]) {
+        document.getElementById('mensaje').style.color = 'red';
+        document.getElementById('mensaje').innerText = 'Selecciona una imagen primero.';
+        return;
+      }
+      var btn = document.getElementById('btnSubir');
+      btn.disabled = true;
+      document.getElementById('mensaje').style.color = 'blue';
+      document.getElementById('mensaje').innerText = 'Subiendo imagen...';
+
+      var file = fileInput.files[0];
+      var formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', UPLOAD_PRESET);
+      formData.append('folder', 'consejo-padres/' + carpeta);
+
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', 'https://api.cloudinary.com/v1_1/' + CLOUD_NAME + '/image/upload', true);
+      xhr.onload = function() {
+        if (xhr.status === 200) {
+          var response = JSON.parse(xhr.responseText);
+          var url = response.secure_url;
+          document.getElementById('mensaje').style.color = 'green';
+          document.getElementById('mensaje').innerText = '✅ Imagen subida correctamente.';
+          document.getElementById('urlResult').value = url;
+          document.getElementById('urlResult').style.display = 'block';
+          document.getElementById('lblUrl').style.display = 'block';
+        } else {
+          document.getElementById('mensaje').style.color = 'red';
+          document.getElementById('mensaje').innerText = '❌ Error al subir: ' + xhr.status;
+        }
+        btn.disabled = false;
+      };
+      xhr.onerror = function() {
+        document.getElementById('mensaje').style.color = 'red';
+        document.getElementById('mensaje').innerText = '❌ Error de conexión.';
+        btn.disabled = false;
+      };
+      xhr.send(formData);
+    }
+  </script>
+</body>
+</html>

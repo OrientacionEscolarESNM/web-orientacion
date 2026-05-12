@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cargando Campaña... | Orientación ENSM</title>
+
+    <!-- Design System & Fonts -->
+    <link rel="stylesheet" href="assets/css/orientacion.css">
+    
+    <!-- Iconify -->
+    <script src="https://code.iconify.design/iconify-icon/1.0.8/iconify-icon.min.js"></script>
+
+    <style>
+        .campaign-hero {
+            position: relative;
+            padding: 10rem 0 6rem;
+            background-size: cover;
+            background-position: center;
+            color: white;
+            text-align: center;
+        }
+
+        .campaign-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(26, 77, 74, 0.95));
+        }
+
+        .hero-content-inner {
+            position: relative;
+            z-index: 2;
+        }
+
+        .content-body {
+            padding: 4rem 0;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.8;
+            font-size: 1.15rem;
+            color: var(--clr-text-muted);
+        }
+
+        .resource-card {
+            background: var(--clr-bg-alt);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            border: 1px solid var(--clr-border);
+            text-decoration: none;
+            color: var(--clr-text);
+            transition: 0.3s;
+        }
+
+        .resource-card:hover {
+            border-color: var(--clr-primary);
+            background: white;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 3rem;
+        }
+
+        .gallery-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .gallery-img:hover {
+            opacity: 0.8;
+        }
+
+        #loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: white;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="loading-overlay">
+        <div style="text-align: center;">
+            <iconify-icon icon="line-md:loading-twotone-loop" width="48" height="48" style="color: var(--clr-primary);"></iconify-icon>
+            <p style="margin-top: 1rem; font-weight: 600;">Cargando contenido...</p>
+        </div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="site-header">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">
+                    <img src="assets/img/escudo-norma.jpeg" alt="Escudo ENSM">
+                </div>
+                <div class="logo-text">
+                    <h1 id="site-title">Orientación Escolar</h1>
+                </div>
+            </a>
+            <nav class="nav-links">
+                <a href="index.html">Inicio</a>
+                <a href="campanas.html">Ver todas las Campañas</a>
+            </nav>
+        </div>
+    </header>
+
+    <main id="campaign-page-content" style="opacity: 0; transition: opacity 0.5s ease;">
+        <section id="hero-section" class="campaign-hero">
+            <div class="container hero-content-inner">
+                <span id="detail-program" class="eyebrow" style="color: var(--clr-secondary-light); margin-bottom: 1rem; display: block; font-weight: 700;"></span>
+                <h2 id="detail-title" class="font-display" style="font-size: clamp(2.5rem, 6vw, 4.5rem); margin: 0; line-height: 1.1;"></h2>
+                <p id="detail-date" style="margin-top: 2rem; opacity: 0.8; font-weight: 600;"></p>
+            </div>
+        </section>
+
+        <article class="container">
+            <div class="content-body" id="detail-content">
+                <!-- Main text here -->
+            </div>
+
+            <!-- Media Gallery -->
+            <div id="gallery-section" style="margin-top: 6rem; display: none;">
+                <h3 class="font-display" style="font-size: 2rem; margin-bottom: 2rem;">Evidencias y <em>Galería</em></h3>
+                <div id="gallery-container" class="gallery-grid"></div>
+            </div>
+
+            <!-- Resources / Downloads -->
+            <div id="resources-section" style="margin-top: 6rem; margin-bottom: 8rem; display: none;">
+                <h3 class="font-display" style="font-size: 2rem; margin-bottom: 2rem;">Recursos y <em>Documentos</em></h3>
+                <div id="resources-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+                </div>
+            </div>
+        </article>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container copyright" style="text-align: center; border-top: none;">
+            &copy; 2026 Escuela Normal Superior de Monterrey | Orientación Escolar
+        </div>
+    </footer>
+
+    <!-- Logic Layer -->
+    <script src="assets/js/data.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const campaignId = urlParams.get('id');
+
+            if (!campaignId) {
+                window.location.href = 'campanas.html';
+                return;
+            }
+
+            // Fetch Data
+            const campanas = await getSheetData('campañas');
+            const data = campanas.find(c => c.id === campaignId);
+
+            if (!data) {
+                document.body.innerHTML = '<div style="text-align:center; padding: 10rem;"><h3>Campaña no encontrada</h3><a href="campanas.html">Volver al listado</a></div>';
+                return;
+            }
+
+            // Fill Content
+            document.title = `${data.titulo} | Orientación ENSM`;
+            document.getElementById('detail-title').textContent = data.titulo;
+            document.getElementById('detail-program').textContent = data.programa;
+            document.getElementById('detail-date').textContent = data.fecha ? `Fecha: ${data.fecha}` : '';
+            document.getElementById('detail-content').innerHTML = data.contenido || data.resumen || '';
+            
+            if (data.imagen_portada) {
+                document.getElementById('hero-section').style.backgroundImage = `url('${data.imagen_portada}')`;
+            }
+
+            // Gallery
+            if (data.galeria) {
+                const galleryUrls = data.galeria.split(',').map(u => u.trim());
+                if (galleryUrls.length > 0) {
+                    const gallerySec = document.getElementById('gallery-section');
+                    const galleryCont = document.getElementById('gallery-container');
+                    gallerySec.style.display = 'block';
+                    galleryUrls.forEach(url => {
+                        const img = document.createElement('img');
+                        img.src = url;
+                        img.className = 'gallery-img';
+                        img.loading = 'lazy';
+                        galleryCont.appendChild(img);
+                    });
+                }
+            }
+
+            // Resources (Format: Label|URL, Label|URL)
+            if (data.recursos) {
+                const resources = data.recursos.split(',').map(r => r.trim());
+                if (resources.length > 0) {
+                    const resSec = document.getElementById('resources-section');
+                    const resCont = document.getElementById('resources-container');
+                    resSec.style.display = 'block';
+                    resources.forEach(res => {
+                        const [label, url] = res.split('|').map(s => s.trim());
+                        if (label && url) {
+                            const card = document.createElement('a');
+                            card.href = url;
+                            card.target = '_blank';
+                            card.className = 'resource-card';
+                            card.innerHTML = `
+                                <iconify-icon icon="mdi:file-download-outline" width="32" height="32" style="color: var(--clr-primary);"></iconify-icon>
+                                <div>
+                                    <h5 style="margin:0; font-size: 1rem;">${label}</h5>
+                                    <p style="margin:0; font-size: 0.8rem; opacity: 0.7;">Descargar archivo</p>
+                                </div>
+                            `;
+                            resCont.appendChild(card);
+                        }
+                    });
+                }
+            }
+
+            // Finish Loading
+            document.getElementById('loading-overlay').style.display = 'none';
+            document.getElementById('campaign-page-content').style.opacity = '1';
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campañas y Programas | Orientación Escolar ENSM</title>
+    <meta name="description" content="Explora los programas institucionales y campañas de Orientación Escolar de la ENSM.">
+
+    <!-- Design System & Fonts -->
+    <link rel="stylesheet" href="assets/css/orientacion.css">
+    
+    <!-- Reveal animations -->
+    <script src="https://unpkg.com/scrollreveal"></script>
+    <!-- Iconify -->
+    <script src="https://code.iconify.design/iconify-icon/1.0.8/iconify-icon.min.js"></script>
+
+    <style>
+        .page-header-simple {
+            padding: 8rem 0 4rem;
+            background: var(--clr-bg-alt);
+            text-align: center;
+            border-bottom: 1px solid var(--clr-border);
+        }
+
+        .filter-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.8rem;
+            margin: 2rem 0;
+            padding: 0 1rem;
+        }
+
+        .filter-chip {
+            padding: 0.6rem 1.2rem;
+            border-radius: 50px;
+            background: white;
+            border: 1px solid var(--clr-border);
+            color: var(--clr-text-muted);
+            cursor: pointer;
+            transition: 0.3s ease;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .filter-chip:hover {
+            border-color: var(--clr-primary);
+            color: var(--clr-primary);
+        }
+
+        .filter-chip.active {
+            background: var(--clr-primary);
+            color: white;
+            border-color: var(--clr-primary);
+            box-shadow: 0 4px 15px rgba(26, 77, 74, 0.2);
+        }
+
+        .programs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-bottom: 6rem;
+        }
+
+        .campaign-card {
+            background: white;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            border: 1px solid var(--clr-border);
+            transition: 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .campaign-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.06);
+            border-color: var(--clr-primary-light);
+        }
+
+        .campaign-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .campaign-content {
+            padding: 1.5rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .campaign-tag {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--clr-primary);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .campaign-title {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            color: var(--clr-text);
+            line-height: 1.2;
+        }
+
+        .campaign-excerpt {
+            font-size: 0.95rem;
+            color: var(--clr-text-muted);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .campaign-link {
+            margin-top: auto;
+            color: var(--clr-primary);
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .campaign-link:hover iconify-icon {
+            transform: translateX(5px);
+        }
+
+        .program-description-box {
+            background: var(--clr-highlight-bg);
+            border-radius: var(--radius-lg);
+            padding: 3rem;
+            margin-bottom: 4rem;
+            border: 1px dashed var(--clr-primary-light);
+            display: none; /* Se muestra al filtrar */
+        }
+
+        #empty-state {
+            text-align: center;
+            padding: 4rem 0;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header Navigation -->
+    <header class="site-header">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">
+                    <img src="assets/img/escudo-norma.jpeg" alt="Escudo ENSM">
+                </div>
+                <div class="logo-text">
+                    <h1 id="site-title">Orientación Escolar</h1>
+                    <span id="site-institution">Escuela Normal Superior de Monterrey</span>
+                </div>
+            </a>
+
+            <nav class="nav-links">
+                <a href="index.html#area">El Área</a>
+                <a href="index.html#agenda">Agenda</a>
+                <a href="campanas.html" class="active">Campañas</a>
+                <a href="index.html#recursos">Recursos</a>
+                <a href="index.html#contacto">Contacto</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="page-header-simple">
+            <div class="container">
+                <span class="eyebrow" style="color: var(--clr-primary); font-weight: 700;">Institucional</span>
+                <h2 class="font-display" style="font-size: clamp(2.5rem, 5vw, 4rem); margin: 0.5rem 0;">Programas y <em>Campañas</em></h2>
+                <p style="max-width: 600px; margin: 1rem auto 0; color: var(--clr-text-muted);">Descubre las iniciativas y proyectos que transforman nuestra comunidad educativa.</p>
+            </div>
+        </section>
+
+        <section class="container" style="padding-top: 2rem;">
+            <!-- Filters -->
+            <div class="filter-container" id="program-filters">
+                <button class="filter-chip active" data-program="all">Todas las Campañas</button>
+                <!-- JS will inject filters for the 7 programs -->
+            </div>
+
+            <!-- Program Info Box (Visible when a specific program is selected) -->
+            <div id="program-info" class="program-description-box">
+                <h3 id="program-title" class="font-display" style="font-size: 2rem; color: var(--clr-primary); margin-bottom: 1rem;"></h3>
+                <p id="program-desc" style="color: var(--clr-text-muted); line-height: 1.8; font-size: 1.1rem;"></p>
+            </div>
+
+            <!-- Campaigns Grid -->
+            <div id="campaigns-container" class="programs-grid">
+                <!-- Dynamic Content -->
+            </div>
+
+            <div id="empty-state">
+                <iconify-icon icon="mdi:folder-open-outline" width="64" height="64" style="color: var(--clr-border);"></iconify-icon>
+                <p style="margin-top: 1rem; color: var(--clr-text-muted);">No se encontraron campañas en este programa aún.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-content">
+            <div class="footer-logo">
+                <h4>Orientación Escolar</h4>
+                <p>Acompañamos el desarrollo integral de la Escuela Normal Superior de Monterrey.</p>
+            </div>
+            <div class="footer-links">
+                <h5>Navegación</h5>
+                <ul>
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="index.html#area">El Área</a></li>
+                    <li><a href="index.html#agenda">Agenda</a></li>
+                    <li><a href="campanas.html">Campañas</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="container copyright">
+            &copy; 2026 Escuela Normal Superior de Monterrey.
+        </div>
+    </footer>
+
+    <!-- Logic Layer -->
+    <script src="assets/js/data.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const container = document.getElementById('campaigns-container');
+            const filterContainer = document.getElementById('program-filters');
+            const infoBox = document.getElementById('program-info');
+            const emptyState = document.getElementById('empty-state');
+
+            // 1. Fetch Data
+            const campanas = await getSheetData('campañas');
+            const programas = await getSheetData('programas');
+
+            // 2. Render Filters (based on the 7 institucional programs)
+            if (programas && programas.length > 0) {
+                programas.forEach(p => {
+                    const btn = document.createElement('button');
+                    btn.className = 'filter-chip';
+                    btn.dataset.program = p.nombre;
+                    btn.textContent = p.nombre;
+                    filterContainer.appendChild(btn);
+                });
+            }
+
+            // 3. Render Campaigns Function
+            function renderCampañas(filter = 'all') {
+                container.innerHTML = '';
+                
+                // Show/Hide Program Info
+                if (filter === 'all') {
+                    infoBox.style.display = 'none';
+                } else {
+                    const prog = programas.find(p => p.nombre === filter);
+                    if (prog) {
+                        infoBox.style.display = 'block';
+                        document.getElementById('program-title').textContent = prog.nombre;
+                        document.getElementById('program-desc').textContent = prog.descripcion || prog.subtitulo || '';
+                    }
+                }
+
+                const filtered = filter === 'all' 
+                    ? campanas 
+                    : campanas.filter(c => c.programa === filter);
+
+                if (filtered.length === 0) {
+                    emptyState.style.display = 'block';
+                } else {
+                    emptyState.style.display = 'none';
+                    filtered.forEach(c => {
+                        const card = document.createElement('div');
+                        card.className = 'campaign-card';
+                        card.innerHTML = `
+                            <img src="${c.imagen_portada || 'assets/img/hero-bg.jpg'}" alt="${c.titulo}">
+                            <div class="campaign-content">
+                                <span class="campaign-tag">${c.programa}</span>
+                                <h4 class="campaign-title">${c.titulo}</h4>
+                                <p class="campaign-excerpt">${c.resumen || ''}</p>
+                                <a href="campana.html?id=${c.id}" class="campaign-link">
+                                    Ver detalles 
+                                    <iconify-icon icon="mdi:arrow-right" width="20"></iconify-icon>
+                                </a>
+                            </div>
+                        `;
+                        container.appendChild(card);
+                    });
+                }
+            }
+
+            // 4. Initial Render
+            renderCampañas();
+
+            // 5. Filter Logic
+            filterContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('filter-chip')) {
+                    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+                    e.target.classList.add('active');
+                    renderCampañas(e.target.dataset.program);
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

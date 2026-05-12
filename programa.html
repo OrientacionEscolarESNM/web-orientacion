@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cargando Programa... | Orientación ENSM</title>
+
+    <!-- Design System & Fonts -->
+    <link rel="stylesheet" href="assets/css/orientacion.css">
+    
+    <!-- Iconify -->
+    <script src="https://code.iconify.design/iconify-icon/1.0.8/iconify-icon.min.js"></script>
+
+    <style>
+        .program-detail-header {
+            position: relative;
+            background-color: #fdfdfd;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .program-detail-header::before {
+            display: none;
+        }
+
+        .section-title-alt {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            margin: 4rem 0 2rem;
+            color: var(--clr-primary);
+            border-bottom: 2px solid var(--clr-highlight);
+            display: inline-block;
+            padding-bottom: 0.5rem;
+        }
+
+        .activity-item {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 3rem;
+            margin-bottom: 4rem;
+            border: 1px solid var(--clr-border);
+            box-shadow: var(--shadow-sm);
+            scroll-margin-top: 100px;
+        }
+
+        .activity-item:hover {
+            border-color: var(--clr-primary-light);
+            box-shadow: var(--shadow-md);
+        }
+
+        .activity-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--clr-border);
+            padding-bottom: 1.5rem;
+            gap: 2rem;
+        }
+
+        .activity-title-area h4 {
+            font-size: 2rem;
+            color: var(--clr-text);
+            margin-bottom: 0.5rem;
+            line-height: 1.2;
+        }
+
+        .activity-badges {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .badge-status {
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-en-curso { background: #e8f0fe; color: #1967d2; }
+        .status-próxima { background: #e6f4ea; color: #1e7e34; }
+        .status-finalizada { background: #f1f3f4; color: #5f6368; }
+        .status-cancelada { background: #fce8e6; color: #d93025; }
+
+        .activity-meta-info {
+            display: flex;
+            gap: 2rem;
+            color: var(--clr-text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
+
+        .meta-detail {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .meta-detail iconify-icon {
+            color: var(--clr-primary);
+        }
+
+        /* Recursos Visuales */
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .resource-btn {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            background: white;
+            padding: 1rem;
+            border-radius: 20px;
+            text-decoration: none;
+            color: var(--clr-text);
+            font-weight: 700;
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid var(--clr-border);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+
+        .resource-btn:hover {
+            transform: translateY(-5px);
+            border-color: var(--clr-primary);
+            box-shadow: var(--shadow-md);
+            background: var(--clr-highlight);
+        }
+
+        .resource-img {
+            width: 70px;
+            height: 70px;
+            border-radius: 12px;
+            object-fit: cover;
+            flex-shrink: 0;
+            background: #f0f0f0;
+        }
+
+        .resource-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+
+        .resource-type {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            color: var(--clr-primary);
+            font-weight: 800;
+        }
+
+        /* Galería */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .gallery-item {
+            border-radius: 12px;
+            overflow: hidden;
+            aspect-ratio: 4/3;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .gallery-item img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+
+        @media (max-width: 768px) {
+            .activity-item-header { flex-direction: column; gap: 1rem; }
+            .activity-meta-info { flex-direction: column; gap: 0.8rem; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header Navigation -->
+    <header class="site-header">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">
+                    <img src="assets/img/escudo-norma.jpeg" alt="Escudo ENSM">
+                </div>
+                <div class="logo-text">
+                    <h1 id="site-title">Orientación Escolar</h1>
+                </div>
+            </a>
+            <nav class="nav-links">
+                <a href="index.html">Inicio</a>
+                <a href="programas.html">Ver todos los Programas</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Dynamic Hero Image -->
+        <section id="program-header" class="program-detail-header" style="min-height: 80vh; padding: 0;"></section>
+
+        <!-- Program Info Section -->
+        <section class="program-info-section" style="padding: 4rem 0; background: white;">
+            <div class="container" style="max-width: 900px; text-align: center;">
+                <span id="detail-subtitle" class="eyebrow" style="color: var(--clr-primary); font-weight: 700; display: block; margin-bottom: 1rem;"></span>
+                <h2 id="detail-name" class="font-display" style="font-size: clamp(2.5rem, 5vw, 4rem); color: var(--clr-text); margin-bottom: 2rem; line-height: 1.1;"></h2>
+                <div class="divider" style="width: 60px; height: 4px; background: var(--clr-primary-light); margin: 0 auto 2.5rem; border-radius: 2px;"></div>
+                <p id="detail-desc" class="lead" style="color: var(--clr-text-muted); font-size: 1.2rem; line-height: 1.8;"></p>
+            </div>
+        </section>
+
+        <!-- Activities & Resources -->
+        <section id="content-section" class="section-prime">
+            <div class="container">
+                <div class="section-header" style="margin-bottom: 4rem;">
+                    <span class="eyebrow">Acción Institucional</span>
+                    <h3 class="font-display">Próximas <em>Actividades</em></h3>
+                </div>
+                <div id="activities-container">
+                    <!-- Dinámico -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container copyright" style="text-align: center;">
+            &copy; 2026 Escuela Normal Superior de Monterrey | Orientación Escolar
+        </div>
+    </footer>
+
+    <!-- Logic Layer -->
+    <script src="assets/js/data.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const programId = urlParams.get('id');
+
+            if (!programId) {
+                window.location.href = 'programas.html';
+                return;
+            }
+
+            // Fetch Data
+            const programas = await getSheetData('programas');
+            const actividades = await getSheetData('actividades');
+            const recursos = await getSheetData('recursos');
+            
+            const prog = programas.find(p => p.id === programId);
+            if (!prog) {
+                document.body.innerHTML = '<div style="text-align:center; padding: 10rem;"><h3>Programa no encontrado</h3><a href="programas.html">Volver al listado</a></div>';
+                return;
+            }
+
+            // 1. Fill Header & Desc
+            document.title = `${prog.nombre} | Orientación ENSM`;
+            document.getElementById('detail-name').textContent = prog.nombre;
+            document.getElementById('detail-subtitle').textContent = prog.subtitulo || 'Programa Institucional';
+            document.getElementById('detail-desc').textContent = prog.descripcion;
+
+            // Set Background Image
+            const header = document.getElementById('program-header');
+            const bgImg = prog.imagen_portada || 'assets/img/hero-bg.jpg';
+            header.style.backgroundImage = `url('${bgImg}')`;
+            header.style.backgroundSize = 'cover';
+            header.style.backgroundPosition = 'center';
+
+            // 2. Render Activities belonging to this program
+            const progActivities = (actividades || []).filter(a => a.programa_id === programId && (a.visible || '').toLowerCase() !== 'no');
+            
+            // --- Ordenar por Estado ---
+            const order = { 'en curso': 1, 'próximo': 2, 'finalizada': 3, 'cancelada': 4 };
+            progActivities.sort((a, b) => {
+                const statusA = (a.estado || 'próximo').toLowerCase();
+                const statusB = (b.estado || 'próximo').toLowerCase();
+                return (order[statusA] || 99) - (order[statusB] || 99);
+            });
+
+            const container = document.getElementById('activities-container');
+
+            if (progActivities.length === 0) {
+                container.innerHTML = '<p class="text-muted">No se han registrado actividades recientes para este programa.</p>';
+            } else {
+                progActivities.forEach(act => {
+                    const activityId = (act.id || act.titulo || '').toString().trim().toLowerCase().replace(/\s+/g, '-');
+                    const item = document.createElement('div');
+                    item.className = 'activity-item';
+                    item.id = `activity-${activityId}`;
+                    
+                    // Status Badge
+                    const status = (act.estado || 'próxima').toLowerCase();
+                    
+                    // --- Resources Logic (Visual Cards) ---
+                    let resourcesHtml = '';
+                    const actResources = (recursos || []).filter(r => 
+                        (r.id_actividad || '').toString().trim().toLowerCase() === activityId &&
+                        (r.visible || 'si').toLowerCase() !== 'no'
+                    );
+
+                    if (actResources.length > 0 || (act.recursos && act.recursos.trim())) {
+                        resourcesHtml = '<div class="resources-grid">';
+                        
+                        // New Relational Format
+                        actResources.forEach(res => {
+                            let icon = 'mdi:file-download-outline';
+                            const type = (res.tipo || '').toLowerCase();
+                            if (type.includes('video')) icon = 'mdi:video-outline';
+                            if (type.includes('web')) icon = 'mdi:launch';
+
+                            const previewImg = res.imagen_carrusel || res.imagen;
+                            const imgHtml = previewImg ? `<img src="${previewImg}" class="resource-img" alt="Vista previa">` : 
+                                          `<div class="resource-img" style="display:flex;align-items:center;justify-content:center;background:var(--clr-highlight);">
+                                             <iconify-icon icon="${icon}" width="28" style="color:var(--clr-primary)"></iconify-icon>
+                                           </div>`;
+
+                            resourcesHtml += `<a href="${res.link || '#'}" target="_blank" class="resource-btn">
+                                ${imgHtml}
+                                <div class="resource-info">
+                                    <span class="resource-type">${res.tipo || 'Recurso'}</span>
+                                    <span class="resource-title">${res.titulo || 'Descargar'}</span>
+                                </div>
+                            </a>`;
+                        });
+
+                        // Legacy Fallback
+                        if (act.recursos && act.recursos.trim()) {
+                            act.recursos.split(',').forEach(resStr => {
+                                const [label, url] = resStr.split('|').map(s => s.trim());
+                                if (label && url) {
+                                    resourcesHtml += `<a href="${url}" target="_blank" class="resource-btn">
+                                        <div class="resource-img" style="display:flex;align-items:center;justify-content:center;background:var(--clr-highlight);">
+                                             <iconify-icon icon="mdi:file-download-outline" width="28" style="color:var(--clr-primary)"></iconify-icon>
+                                        </div>
+                                        <div class="resource-info">
+                                            <span class="resource-type">Recurso</span>
+                                            <span class="resource-title">${label}</span>
+                                        </div>
+                                    </a>`;
+                                }
+                            });
+                        }
+                        resourcesHtml += '</div>';
+                    }
+
+                    // --- Gallery Logic ---
+                    let galleryHtml = '';
+                    if (act.galeria && act.galeria.trim()) {
+                        galleryHtml = '<div class="gallery-grid">';
+                        act.galeria.split(',').forEach(imgUrl => {
+                            if (imgUrl.trim()) {
+                                galleryHtml += `<div class="gallery-item"><img src="${imgUrl.trim()}" alt="Evidencia"></div>`;
+                            }
+                        });
+                        galleryHtml += '</div>';
+                    }
+
+                    item.innerHTML = `
+                        <div class="activity-item-header">
+                            <div class="activity-title-area">
+                                <h4>${act.titulo}</h4>
+                                <div class="activity-badges">
+                                    <span class="badge-status status-${status.replace(/\s+/g, '-')}">${status}</span>
+                                </div>
+                            </div>
+                            <div class="activity-meta-info">
+                                <div class="meta-detail">
+                                    <iconify-icon icon="mdi:calendar-outline"></iconify-icon>
+                                    <span>${act['fecha / hora'] || act.fecha || 'Por definir'}</span>
+                                </div>
+                                <div class="meta-detail">
+                                    <iconify-icon icon="mdi:account-group-outline"></iconify-icon>
+                                    <span>${act.publico || 'Comunidad'}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="activity-body">
+                            <p style="font-size: 1.1rem; line-height: 1.6; color: var(--clr-text-muted); margin-bottom: 2rem;">
+                                ${act.descripcion || ''}
+                            </p>
+                            
+                            ${resourcesHtml ? `<h5 style="font-weight:700; margin-bottom:1rem;">Recurso y Materiales</h5>${resourcesHtml}` : ''}
+                            ${galleryHtml ? `<h5 style="font-weight:700; margin-top:2.5rem; margin-bottom:1rem;">Galería de Evidencias</h5>${galleryHtml}` : ''}
+                        </div>
+                    `;
+                    container.appendChild(item);
+                });
+            }
+
+            // Scroll to activity if hash exists
+            if (window.location.hash) {
+                setTimeout(() => {
+                    const el = document.querySelector(window.location.hash);
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }, 500);
+            }
+        });
+    </script>
+</body>
+
+</html>

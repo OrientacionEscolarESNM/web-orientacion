@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actividad | Orientación ENSM</title>
+    
+    <!-- Design System & Fonts -->
+    <link rel="stylesheet" href="assets/css/orientacion.css">
+    
+    <!-- Iconify -->
+    <script src="https://code.iconify.design/iconify-icon/1.0.8/iconify-icon.min.js"></script>
+
+    <style>
+        .activity-detail-hero {
+            position: relative;
+            min-height: 60vh;
+            background-color: #050d0c;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            padding-top: 80px;
+        }
+
+        .activity-detail-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(5, 13, 12, 0.4), rgba(5, 13, 12, 0.8));
+            z-index: 1;
+        }
+
+        .hero-content-inner {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            max-width: 800px;
+        }
+
+        .activity-card-container {
+            margin-top: -100px;
+            position: relative;
+            z-index: 10;
+            margin-bottom: 4rem;
+        }
+
+        .main-activity-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 3rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--clr-border);
+        }
+
+        .activity-meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin: 2.5rem 0;
+            padding: 1.5rem 0;
+            border-top: 1px solid var(--clr-border);
+            border-bottom: 1px solid var(--clr-border);
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .meta-item iconify-icon {
+            font-size: 1.8rem;
+            color: var(--clr-primary);
+            background: var(--clr-highlight);
+            padding: 0.8rem;
+            border-radius: 12px;
+        }
+
+        .meta-label {
+            display: block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--clr-text-muted);
+            font-weight: 700;
+        }
+
+        .meta-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--clr-text);
+        }
+
+        .badge-status {
+            display: inline-block;
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1.5rem;
+        }
+
+        .status-próxima { background: #e6f4ea; color: #1e7e34; }
+        .status-en-curso { background: #e8f0fe; color: #1967d2; }
+        .status-finalizada { background: #f1f3f4; color: #5f6368; }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .gallery-item {
+            border-radius: 20px;
+            overflow: hidden;
+            aspect-ratio: 4/3;
+            box-shadow: var(--shadow-sm);
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .resource-btn {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            background: white;
+            padding: 1rem;
+            border-radius: 20px;
+            text-decoration: none;
+            color: var(--clr-text);
+            font-weight: 700;
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid var(--clr-border);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+
+        .resource-btn:hover {
+            transform: translateY(-5px);
+            border-color: var(--clr-primary);
+            box-shadow: var(--shadow-md);
+            background: var(--clr-highlight);
+        }
+
+        .resource-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            object-fit: cover;
+            flex-shrink: 0;
+            background: #f0f0f0;
+        }
+
+        .resource-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .resource-type {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: var(--clr-primary);
+            font-weight: 800;
+        }
+
+        .resource-title {
+            font-size: 0.95rem;
+            line-height: 1.3;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header Navigation -->
+    <header class="site-header">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">
+                    <img src="assets/img/escudo-norma.jpeg" alt="Escudo ENSM">
+                </div>
+                <div class="logo-text">
+                    <h1 id="site-title">Orientación Escolar</h1>
+                    <span id="site-institution">Escuela Normal Superior de Monterrey</span>
+                </div>
+            </a>
+
+            <nav class="nav-links">
+                <a href="index.html">Inicio</a>
+                <a href="index.html#agenda">Agenda</a>
+                <a href="programas.html">Programas</a>
+                <a href="index.html#recursos">Recursos</a>
+                <a href="index.html#contacto">Contacto</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Full-width Hero -->
+        <section id="activity-hero" class="activity-detail-hero">
+            <div class="container hero-content-inner">
+                <span id="activity-category" class="eyebrow" style="color: var(--clr-accent-light); margin-bottom: 1rem; display: block;">Actividad Institucional</span>
+                <h1 id="activity-title" class="font-display" style="font-size: clamp(2.5rem, 6vw, 4.5rem); line-height: 1.1; margin: 0;">Cargando...</h1>
+            </div>
+        </section>
+
+        <div class="container activity-card-container">
+            <article class="main-activity-card">
+                <div id="activity-status" class="badge-status"></div>
+                
+                <div id="activity-desc" class="lead" style="font-size: 1.25rem; line-height: 1.8; color: var(--clr-text-muted); margin-bottom: 2rem;">
+                    Buscando detalles de la actividad...
+                </div>
+
+                <div class="activity-meta-grid">
+                    <div class="meta-item">
+                        <iconify-icon icon="mdi:calendar-clock"></iconify-icon>
+                        <div>
+                            <span class="meta-label">Fecha y Hora</span>
+                            <span id="activity-date" class="meta-value">-</span>
+                        </div>
+                    </div>
+                    <div class="meta-item">
+                        <iconify-icon icon="mdi:account-group"></iconify-icon>
+                        <div>
+                            <span class="meta-label">Público Objetivo</span>
+                            <span id="activity-target" class="meta-value">-</span>
+                        </div>
+                    </div>
+                    <div class="meta-item" id="meta-location">
+                        <iconify-icon icon="mdi:map-marker-radius"></iconify-icon>
+                        <div>
+                            <span class="meta-label">Ubicación</span>
+                            <span id="activity-location" class="meta-value">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resources Section -->
+                <div id="resources-section" style="display: none; margin-top: 3rem;">
+                    <h3 class="font-display" style="font-size: 2rem; margin-bottom: 1.5rem;">Recursos y <em>Materiales</em></h3>
+                    <div id="resources-list" style="display: flex; flex-wrap: wrap; gap: 1rem;"></div>
+                </div>
+
+                <!-- Gallery Section -->
+                <div id="gallery-section" style="display: none; margin-top: 4rem;">
+                    <h3 class="font-display" style="font-size: 2rem; margin-bottom: 1.5rem;">Galería de <em>Fotos</em></h3>
+                    <div id="gallery-grid" class="gallery-grid"></div>
+                </div>
+            </article>
+            
+            <div style="text-align: center; margin-top: 2rem;">
+                <a href="index.html#agenda" class="btn btn-secondary" style="border-radius: 99px;">&larr; Volver a la Agenda</a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container copyright" style="text-align: center;">
+            &copy; 2026 Escuela Normal Superior de Monterrey. Todos los derechos reservados.
+        </div>
+    </footer>
+
+    <!-- Logic Layer -->
+    <script src="assets/js/data.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const params = new URLSearchParams(window.location.search);
+                const activityId = (params.get('id') || '').trim().toLowerCase();
+
+                if (!activityId) {
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                // Obtener datos
+                const activities = await getSheetData(APP_CONFIG.tabs.actividades);
+                const act = activities.find(a => {
+                    const id = (a.id || a.titulo || '').toString().trim().toLowerCase().replace(/\s+/g, '-');
+                    return id === activityId || (a.id || '').toString().toLowerCase() === activityId;
+                });
+
+                if (!act) {
+                    document.getElementById('activity-title').textContent = 'Actividad no encontrada';
+                    document.getElementById('activity-desc').textContent = 'Lo sentimos, no pudimos encontrar los detalles de esta actividad.';
+                    return;
+                }
+
+                // Inyectar Datos
+                document.title = `${act.titulo} | Orientación ENSM`;
+                document.getElementById('activity-title').textContent = act.titulo;
+                document.getElementById('activity-desc').textContent = act.descripcion || 'Sin descripción detallada disponible.';
+                document.getElementById('activity-date').textContent = act['fecha / hora'] || act.fecha || 'Por definir';
+                document.getElementById('activity-target').textContent = act.publico || 'Comunidad General';
+                
+                const location = act.ubicacion || act.lugar;
+                if (location) {
+                    document.getElementById('activity-location').textContent = location;
+                } else {
+                    document.getElementById('meta-location').style.display = 'none';
+                }
+
+                // Status Badge
+                const status = (act.estado || 'próxima').toLowerCase();
+                const statusEl = document.getElementById('activity-status');
+                statusEl.textContent = status;
+                statusEl.className = `badge-status status-${status.replace(/\s+/g, '-')}`;
+
+                // --- Category/Program & Hero Background ---
+                const allPrograms = await getSheetData('programas');
+                const prog = allPrograms.find(p => p.id === act.programa_id);
+                
+                if (prog) {
+                    document.getElementById('activity-category').textContent = prog.nombre;
+                } else if (act.programa) {
+                    document.getElementById('activity-category').textContent = act.programa;
+                }
+
+                // Hero Background Logic: Activity Image -> Program/Campaign Image -> Default
+                const hero = document.getElementById('activity-hero');
+                const img = act.imagen_portada || act.imagen || (prog ? (prog.imagen_portada || prog.imagen) : null) || 'assets/img/hero-bg.jpg';
+                hero.style.backgroundImage = `url('${img}')`;
+
+                // --- Resources (Relational Logic) ---
+                const allResources = await getSheetData('recursos');
+                const activityResources = allResources.filter(r => 
+                    (r.id_actividad || '').toString().trim().toLowerCase() === activityId &&
+                    (r.visible || 'si').toLowerCase() !== 'no'
+                );
+
+                const resContainer = document.getElementById('resources-list');
+                
+                if (activityResources.length > 0) {
+                    document.getElementById('resources-section').style.display = 'block';
+                    activityResources.forEach(res => {
+                        const btn = document.createElement('a');
+                        btn.href = res.link || '#';
+                        btn.target = '_blank';
+                        btn.className = 'resource-btn';
+                        
+                        // Icon mapping
+                        let icon = 'mdi:file-download-outline';
+                        const type = (res.tipo || '').toLowerCase();
+                        if (type.includes('video')) icon = 'mdi:video-outline';
+                        if (type.includes('web')) icon = 'mdi:launch';
+
+                        // Check for preview image
+                        const previewImg = res.imagen_carrusel || res.imagen;
+                        const imgHtml = previewImg ? `<img src="${previewImg}" class="resource-img" alt="Vista previa">` : 
+                                      `<div class="resource-img" style="display:flex;align-items:center;justify-content:center;background:var(--clr-highlight);">
+                                         <iconify-icon icon="${icon}" width="32" style="color:var(--clr-primary)"></iconify-icon>
+                                       </div>`;
+
+                        btn.innerHTML = `
+                            ${imgHtml}
+                            <div class="resource-info">
+                                <span class="resource-type">${res.tipo || 'Recurso'}</span>
+                                <span class="resource-title">${res.titulo || 'Descargar'}</span>
+                            </div>
+                        `;
+                        resContainer.appendChild(btn);
+                    });
+                } else if (act.recursos && act.recursos.trim()) {
+                    // Fallback to legacy inline resources format (Label|URL)
+                    const resList = act.recursos.split(',').map(r => r.trim());
+                    document.getElementById('resources-section').style.display = 'block';
+                    
+                    resList.forEach(res => {
+                        const [label, url] = res.split('|').map(s => s.trim());
+                        if (url) {
+                            const btn = document.createElement('a');
+                            btn.href = url;
+                            btn.target = '_blank';
+                            btn.className = 'resource-btn';
+                            btn.innerHTML = `<iconify-icon icon="mdi:file-download-outline" width="20"></iconify-icon> ${label || 'Descargar Recurso'}`;
+                            resContainer.appendChild(btn);
+                        }
+                    });
+                }
+
+                // Gallery
+                if (act.galeria && act.galeria.trim()) {
+                    const images = act.galeria.split(',').map(i => i.trim());
+                    const grid = document.getElementById('gallery-grid');
+                    document.getElementById('gallery-section').style.display = 'block';
+                    
+                    images.forEach(imgUrl => {
+                        if (imgUrl) {
+                            const div = document.createElement('div');
+                            div.className = 'gallery-item';
+                            div.innerHTML = `<img src="${imgUrl}" alt="Galería de la actividad">`;
+                            grid.appendChild(div);
+                        }
+                    });
+                }
+
+            } catch (error) {
+                console.error('Error cargando actividad:', error);
+                document.getElementById('activity-title').textContent = 'Error de Conexión';
+                document.getElementById('activity-desc').textContent = 'Hubo un problema al cargar los datos desde la hoja de cálculo.';
+            }
+        });
+    </script>
+</body>
+
+</html>

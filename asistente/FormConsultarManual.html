@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <title>Consultar Manual</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 16px; background: #f5f5f5; }
+    h2 { color: #1e3a5f; font-size: 16px; margin-bottom: 12px; }
+    .card { background: white; padding: 12px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 12px; }
+    textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; box-sizing: border-box; height: 80px; resize: none; }
+    .btn-query { width: 100%; padding: 12px; background: #1e3a5f; color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 8px; }
+    .btn-query:hover { background: #2d5a8f; }
+    .respuesta-area { margin-top: 15px; background: #fff; padding: 15px; border-radius: 8px; border-left: 4px solid #1e3a5f; font-size: 13px; line-height: 1.5; color: #333; display: none; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .loading { text-align: center; display: none; font-size: 13px; color: #1e3a5f; padding: 10px; }
+  </style>
+</head>
+<body>
+  <div style="margin-bottom: 10px;">
+    <button onclick="google.script.run.abrirAsistenteHome()" style="background: none; border: none; color: #1e3a5f; cursor: pointer; font-size: 11px;">🏠 Volver al Inicio</button>
+  </div>
+
+  <h2>🔍 Consultar Manual</h2>
+  <p style="font-size: 11px; color: #666; margin-bottom: 10px;">Haz cualquier pregunta sobre el manual y la IA te responderá basándose en el documento oficial.</p>
+
+  <div class="card">
+    <textarea id="pregunta" placeholder="Ej: ¿Cuáles son las faltas gravísimas?"></textarea>
+    <button class="btn-query" id="btn-query" onclick="consultar()">🔍 Preguntar al Manual</button>
+  </div>
+
+  <div id="loading" class="loading">📖 Buscando en el manual...</div>
+  <div id="respuesta" class="respuesta-area"></div>
+
+  <script>
+    function consultar() {
+      var pregunta = document.getElementById('pregunta').value.trim();
+      if (!pregunta) return;
+
+      document.getElementById('btn-query').disabled = true;
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('respuesta').style.display = 'none';
+
+      google.script.run
+        .withSuccessHandler(function(res) {
+          document.getElementById('btn-query').disabled = false;
+          document.getElementById('loading').style.display = 'none';
+          document.getElementById('respuesta').innerText = res;
+          document.getElementById('respuesta').style.display = 'block';
+        })
+        .withFailureHandler(function(err) {
+          document.getElementById('btn-query').disabled = false;
+          document.getElementById('loading').style.display = 'none';
+          alert("Error: " + err.message);
+        })
+        .responderConsultaIA(pregunta);
+    }
+  </script>
+</body>
+</html>

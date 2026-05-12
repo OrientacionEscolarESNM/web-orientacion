@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <title>Nuevo Programa | Orientación</title>
+  <style>
+    :root {
+      --clr-primary: #1e3a5f;
+      --clr-bg: #f8f9fa;
+      --clr-card: #ffffff;
+    }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background: var(--clr-bg); color: #333; line-height: 1.5; }
+    .container { max-width: 500px; margin: 0 auto; background: var(--clr-card); padding: 24px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+    h2 { color: var(--clr-primary); font-size: 1.4rem; margin-top: 0; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+    
+    .form-group { margin-bottom: 16px; }
+    label { display: block; font-size: 0.8rem; font-weight: 600; color: #555; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+    
+    input, textarea { 
+      width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.9rem; 
+      background: #fff; box-sizing: border-box; transition: all 0.3s;
+    }
+    input:focus, textarea:focus { outline: none; border-color: var(--clr-primary); box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.1); }
+    input[readonly] { background: #f1f3f4; color: #777; border-style: dashed; }
+    
+    .btn { 
+      width: 100%; padding: 12px; background: var(--clr-primary); color: white; border: none; 
+      border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; 
+      transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 10px;
+    }
+    .btn:hover { background: #152944; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    .btn:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+    
+    .btn-secondary { background: #e8eaf6; color: #1e3a5f; }
+    .btn-secondary:hover { background: #c5cae9; }
+
+    .preview-img { 
+      width: 100%; height: 180px; object-fit: cover; border-radius: 8px; 
+      margin-top: 10px; border: 1px solid #eee; background: #eee; display: none;
+    }
+    
+    .msg { padding: 12px; border-radius: 8px; font-size: 0.85rem; margin-top: 15px; display: none; animation: fadeIn 0.3s; }
+    .ok { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
+    .err { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div style="margin-bottom: 20px;">
+      <button onclick="google.script.run.abrirAsistenteHome()" style="background:none; border:none; color:var(--clr-primary); cursor:pointer; font-size: 12px; font-weight:600; padding:0; display:flex; align-items:center; gap:5px;">
+        ← VOLVER AL INICIO
+      </button>
+    </div>
+
+    <h2>🚩 Gestión de Programa</h2>
+
+    <div class="form-group">
+      <label>Nombre del Programa *</label>
+      <input type="text" id="nombre" placeholder="Ej: Prevención en Violencia Sexual" oninput="actualizarSlug(this.value)">
+    </div>
+
+    <div class="form-group">
+      <label>ID (Slug Autogenerado)</label>
+      <input type="text" id="id" readonly>
+    </div>
+
+    <div class="form-group">
+      <label>Subtítulo</label>
+      <input type="text" id="subtitulo" placeholder="Lema o frase corta">
+    </div>
+
+    <div class="form-group">
+      <label>Descripción</label>
+      <textarea id="descripcion" placeholder="Explica de qué trata este programa..."></textarea>
+    </div>
+
+    <div class="form-group" style="background: #fff9c4; padding: 12px; border-radius: 8px; border: 1px solid #fbc02d; margin-bottom: 10px;">
+      <p style="font-size: 0.75rem; color: #5d4037; margin: 0; line-height: 1.4;">
+        <strong>💡 Tip ChatGPT:</strong> Copia este prompt para generar tu imagen:<br>
+        <code id="promptText" style="display:block; margin-top:5px; background: rgba(255,255,255,0.5); padding: 5px; border-radius: 4px;">ahora dame una imagen horizontal, con un estilo de boceto artístico, con trazos de colores, simbólico, que represente la idea de...</code>
+      </p>
+      <button type="button" onclick="copiarPrompt()" style="background:#fbc02d; border:none; border-radius:4px; font-size:10px; font-weight:bold; padding:4px 8px; margin-top:5px; cursor:pointer;">📋 COPIAR PROMPT</button>
+    </div>
+
+    <div class="form-group" style="background: #e3f2fd; padding: 15px; border-radius: 10px; border: 1px dashed #1e88e5;">
+      <label>Imagen de Portada (Recomendado Horizontal)</label>
+      <input type="url" id="imagen_portada" placeholder="Link de la imagen..." oninput="verPrevia(this.value)">
+      
+      <div style="display: flex; gap: 8px; margin-top:8px;">
+        <input type="file" id="archivo" accept="image/*" style="display:none;" onchange="subirImagen()">
+        <button type="button" class="btn btn-secondary" onclick="document.getElementById('archivo').click()" style="margin:0; flex:1;">
+          📂 Subir de este equipo
+        </button>
+      </div>
+      
+      <img id="img-previa" class="preview-img" src="" alt="Previa">
+    </div>
+
+    <div id="msg" class="msg"></div>
+    <button class="btn" id="btn-save" onclick="guardar()" style="margin-top:20px;">
+      💾 Guardar Programa
+    </button>
+  </div>
+
+  <script>
+    function copiarPrompt() {
+      var nombre = document.getElementById('nombre').value;
+      var sub = document.getElementById('subtitulo').value;
+      var prompt = "ahora dame una imagen horizontal, con un estilo de boceto artístico, con trazos de colores, simbólico, que represente la idea de " + nombre + (sub ? " - " + sub : "");
+      
+      navigator.clipboard.writeText(prompt).then(function() {
+        mostrar('ok', '📋 Prompt copiado al portapapeles');
+      });
+    }
+
+    function actualizarSlug(texto) {
+      var slug = texto.toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^\w ]+/g, '')
+        .replace(/ +/g, '-')
+        .replace(/^-+|-+$/g, '');
+      document.getElementById('id').value = slug;
+    }
+
+    function verPrevia(url) {
+      var img = document.getElementById('img-previa');
+      if (url) {
+        img.src = url;
+        img.style.display = 'block';
+      } else {
+        img.style.display = 'none';
+      }
+    }
+
+    function subirImagen() {
+      var file = document.getElementById('archivo').files[0];
+      if (!file) return;
+
+      mostrar('ok', '☁️ Subiendo imagen a Cloudinary...');
+      
+      var CLOUD_NAME = 'denrgxzvw';
+      var UPLOAD_PRESET = 'consejo-padres';
+      var formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', UPLOAD_PRESET);
+      formData.append('folder', 'orientacion/programas');
+
+      fetch('https://api.cloudinary.com/v1_1/' + CLOUD_NAME + '/image/upload', {
+        method: 'POST',
+        body: formData
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.secure_url) {
+          document.getElementById('imagen_portada').value = data.secure_url;
+          verPrevia(data.secure_url);
+          mostrar('ok', '✅ Imagen subida con éxito.');
+        } else {
+          mostrar('err', '❌ Error en la subida.');
+        }
+      })
+      .catch(err => mostrar('err', '❌ Error de red al subir.'));
+    }
+
+    function guardar() {
+      var id = document.getElementById('id').value;
+      var nombre = document.getElementById('nombre').value.trim();
+      if (!nombre) { mostrar('err', '⚠️ El nombre es obligatorio.'); return; }
+      
+      var data = {
+        id: id,
+        nombre: nombre,
+        subtitulo: document.getElementById('subtitulo').value,
+        descripcion: document.getElementById('descripcion').value,
+        imagen_portada: document.getElementById('imagen_portada').value
+      };
+      
+      document.getElementById('btn-save').disabled = true;
+      mostrar('ok', '💾 Guardando en el sistema...');
+      
+      google.script.run
+        .withSuccessHandler(function(r) {
+          mostrar('ok', '✅ ' + r.msg);
+          document.getElementById('btn-save').disabled = false;
+          // No recargamos para evitar el pantallazo en blanco
+          if (r.ok) {
+            document.getElementById('nombre').value = '';
+            document.getElementById('id').value = '';
+            document.getElementById('subtitulo').value = '';
+            document.getElementById('descripcion').value = '';
+            document.getElementById('imagen_portada').value = '';
+            verPrevia('');
+          }
+        })
+        .withFailureHandler(function(e) {
+          mostrar('err', '❌ Error: ' + e.message);
+          document.getElementById('btn-save').disabled = false;
+        })
+        .guardarPrograma(data);
+    }
+    
+    function mostrar(tipo, txt) {
+      var el = document.getElementById('msg');
+      el.className = 'msg ' + tipo;
+      el.innerText = txt;
+      el.style.display = 'block';
+    }
+  </script>
+</body>
+</html>

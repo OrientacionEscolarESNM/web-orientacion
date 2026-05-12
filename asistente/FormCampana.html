@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <title>Nueva Campaña</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 16px; background: #f5f5f5; }
+    h2 { color: #1e3a5f; font-size: 16px; margin-bottom: 16px; }
+    label { display: block; font-size: 12px; font-weight: bold; color: #444; margin-bottom: 4px; margin-top: 10px; }
+    input, select, textarea { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; background: white; box-sizing: border-box; }
+    input[readonly] { background: #eee; color: #777; cursor: not-allowed; }
+    textarea { height: 70px; resize: vertical; }
+    .btn { width: 100%; padding: 10px; background: #1e3a5f; color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: bold; margin-top: 14px; cursor: pointer; }
+    .btn:hover { background: #2d5a8f; }
+    .msg { padding: 8px; border-radius: 6px; font-size: 12px; margin-top: 8px; display: none; }
+    .ok { background: #d4edda; color: #155724; }
+    .err { background: #f8d7da; color: #721c24; }
+  </style>
+</head>
+<body>
+  <div style="margin-bottom: 15px;">
+    <button onclick="google.script.run.abrirAsistenteHome()" style="background: #eee; border: 1px solid #ccc; border-radius: 4px; color: #1e3a5f; cursor: pointer; font-size: 11px; padding: 4px 8px; font-weight: bold;">
+      🏠 Volver al Inicio
+    </button>
+  </div>
+
+  <h2>🚩 Nueva Campaña</h2>
+
+  <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 8px;">
+    <div>
+      <label>ID Autogenerado</label>
+      <input type="text" id="id" readonly value="Cargando...">
+    </div>
+    <div>
+      <label>Nombre de la Campaña *</label>
+      <input type="text" id="nombre" placeholder="Ej: Inscripciones 2026">
+    </div>
+  </div>
+
+  <label>Subtítulo</label>
+  <input type="text" id="subtitulo" placeholder="Breve frase llamativa">
+
+  <label>Descripción</label>
+  <textarea id="descripcion" placeholder="Detalles de la campaña..."></textarea>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+    <div>
+      <label>Estado</label>
+      <select id="estado">
+        <option value="activa">Activa</option>
+        <option value="inactiva">Inactiva</option>
+      </select>
+    </div>
+    <div>
+      <label>Visible</label>
+      <select id="visible">
+        <option value="si">Sí</option>
+        <option value="no">No</option>
+      </select>
+    </div>
+  </div>
+
+  <label>URL Imagen (Cloudinary)</label>
+  <input type="url" id="imagen_url" placeholder="https://res.cloudinary.com/...">
+
+  <label>Enlace de Destino (Automático)</label>
+  <input type="text" id="enlace" readonly>
+
+  <div id="msg" class="msg"></div>
+  <button class="btn" id="btn-save" onclick="guardar()">&#x1F4BE; Guardar Campaña</button>
+
+  <script>
+    // Al cargar, obtener el próximo ID
+    window.onload = function() {
+      google.script.run
+        .withSuccessHandler(function(nextId) {
+          document.getElementById('id').value = nextId;
+          document.getElementById('enlace').value = "campana.html?id=" + nextId;
+        })
+        .obtenerProximoIdCampana();
+    };
+
+    function guardar() {
+      var nombre = document.getElementById('nombre').value.trim();
+      if (!nombre) { mostrar('err', '⚠️ El nombre es obligatorio.'); return; }
+      
+      var data = {
+        id: document.getElementById('id').value,
+        nombre: nombre,
+        subtitulo: document.getElementById('subtitulo').value,
+        descripcion: document.getElementById('descripcion').value,
+        estado: document.getElementById('estado').value,
+        imagen_url: document.getElementById('imagen_url').value,
+        enlace: document.getElementById('enlace').value,
+        visible: document.getElementById('visible').value
+      };
+      
+      document.getElementById('btn-save').disabled = true;
+      mostrar('ok', '💾 Guardando...');
+      
+      google.script.run
+        .withSuccessHandler(function(r) {
+          mostrar('ok', '✅ ' + r.msg);
+          setTimeout(function() { location.reload(); }, 2000); // Recargar para obtener nuevo ID
+        })
+        .withFailureHandler(function(e) {
+          mostrar('err', '❌ Error: ' + e.message);
+          document.getElementById('btn-save').disabled = false;
+        })
+        .guardarCampana(data);
+    }
+    
+    function mostrar(tipo, txt) {
+      var el = document.getElementById('msg');
+      el.className = 'msg ' + tipo;
+      el.innerText = txt;
+      el.style.display = 'block';
+    }
+  </script>
+</body>
+</html>

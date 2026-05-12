@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <title>Agregar Video / Imagen</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+    h2 { color: #1a237e; margin-bottom: 4px; }
+    h3 { color: #555; font-size: 13px; font-weight: normal; margin-bottom: 16px; }
+    label { display: block; margin-top: 12px; font-weight: bold; font-size: 13px; }
+    input, textarea, select { width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 13px; }
+    textarea { height: 70px; resize: vertical; }
+    .tab-btns { display: flex; gap: 8px; margin-top: 12px; }
+    .tab-btn { flex: 1; padding: 8px; border: 2px solid #1a237e; background: white; color: #1a237e; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px; }
+    .tab-btn.active { background: #1a237e; color: white; }
+    .tab-panel { display: none; margin-top: 8px; padding: 12px; background: #e8eaf6; border-radius: 6px; }
+    .tab-panel.active { display: block; }
+    button.guardar { margin-top: 16px; width: 100%; padding: 10px; background: #1a237e; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: bold; }
+    button.guardar:hover { background: #283593; }
+    #preview-video { width: 100%; margin-top: 8px; border-radius: 6px; display: none; }
+    #preview-image { width: 100%; margin-top: 8px; border-radius: 6px; display: none; }
+    #barra-progreso-wrap { margin-top: 8px; display: none; }
+    #barra-progreso { height: 8px; background: #1a237e; border-radius: 4px; width: 0%; transition: width 0.3s; }
+    #mensaje { margin-top: 10px; font-size: 13px; font-weight: bold; }
+    .fila2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  </style>
+</head>
+<body>
+  <div style="margin-bottom: 15px;">
+    <button onclick="google.script.run.abrirAsistenteHome()" style="background: #eee; border: 1px solid #ccc; border-radius: 4px; color: #1e3a5f; cursor: pointer; font-size: 11px; padding: 4px 8px; font-weight: bold;">
+      🏠 Volver al Inicio
+    </button>
+  </div>
+
+  <h2>🎬 Agregar Video / Imagen</h2>
+  <h3>Completa los campos del recurso</h3>
+
+  <label>Título *</label>
+  <input type="text" id="titulo" placeholder="Título" required>
+
+  <label>Descripción</label>
+  <textarea id="descripcion" placeholder="Describe brevemente..."></textarea>
+
+  <div class="fila2">
+    <div>
+      <label>Campaña (cam-XXX)</label>
+      <input type="text" id="campana" placeholder="cam-001">
+    </div>
+    <div>
+      <label>Visible</label>
+      <select id="visible">
+        <option value="si">Sí</option>
+        <option value="no">No</option>
+      </select>
+    </div>
+  </div>
+
+  <label>Fecha</label>
+  <input type="date" id="fecha">
+
+  <label>Fuente del recurso</label>
+  <div class="tab-btns">
+    <button class="tab-btn active" onclick="cambiarTab('upload')">&#x2B06; Subir archivo</button>
+    <button class="tab-btn" onclick="cambiarTab('url')">&#x1F517; URL externa</button>
+  </div>
+
+  <div id="panel-upload" class="tab-panel active">
+    <label>Archivo (video o imagen)</label>
+    <input type="file" id="archivo-video" accept="video/*,image/*" onchange="previsualizar(this)">
+    <video id="preview-video" controls></video>
+    <img id="preview-image" alt="Previsualización">
+    <div id="barra-progreso-wrap">
+      <div style="font-size:11px;margin-bottom:3px;">Subiendo a Cloudinary...</div>
+      <div style="background:#ddd;border-radius:4px;">
+        <div id="barra-progreso"></div>
+      </div>
+    </div>
+    <input type="hidden" id="url-cloudinary">
+    <input type="hidden" id="miniatura-cloudinary">
+  </div>
+
+  <div id="panel-url" class="tab-panel">
+    <label>URL del recurso</label>
+    <input type="url" id="url-externa" placeholder="https://...">
+    <label>URL miniatura (opcional)</label>
+    <input type="url" id="miniatura-externa" placeholder="https://img.youtube.com/vi/.../0.jpg">
+  </div>
+
+  <div id="mensaje"></div>
+  <button class="guardar" onclick="enviarASheets()">&#x1F4BE; Guardar</button>
+
+  <script>
+    var modoActual = 'upload';
+    var urlVideoFinal = '';
+    var miniatura = '';
+
+    function cambiarTab(modo) {
+      modoActual = modo;
+      document.querySelectorAll('.tab-btn').forEach(function(b, i) {
+        b.classList.toggle('active', (i === 0 && modo === 'upload') || (i === 1 && modo === 'url'));
+      });
+      document.getElementById('panel-upload').classList.toggle('active', modo === 'upload');
+      document.getElementById('panel-url').classList.toggle('active', modo === 'url');
+    }
+
+    function previsualizar(input) {
+      var file = input.files[0];
+      var video = document.getElementById('preview-video');
+      var img = document.getElementById('preview-image');
+      video.style.display = 'none';
+      img.style.display = 'none';
+      if (!file) return;
+
+      var tipo = (file.type || '').toLowerCase();
+      var url = URL.createObjectURL(file);
+
+      if (tipo.startsWith('video/')) {
+        video.src = url;
+        video.style.display = 'block';
+      } else if (tipo.startsWith('image/')) {
+        img.src = url;
+        img.style.display = 'block';
+      }
+    }
+
+    function enviarASheets() {
+      var titulo = document.getElementById('titulo').value.trim();
+      if (!titulo) { mostrarMensaje('red', '⚠️ El título es obligatorio.'); return; }
+
+      if (modoActual === 'upload') {
+        var archivo = document.getElementById('archivo-video').files[0];
+        if (!archivo) { mostrarMensaje('red', '⚠️ Selecciona un archivo de video o imagen.'); return; }
+        mostrarMensaje('blue', '☁️ Subiendo archivo a Cloudinary...');
+        subirACloudinary(archivo, function(urlRecurso, miniaturaUrl) {
+          urlVideoFinal = urlRecurso;
+          miniatura = miniaturaUrl;
+          guardarEnSheets();
+        });
+      } else {
+        urlVideoFinal = document.getElementById('url-externa').value.trim();
+        miniatura = document.getElementById('miniatura-externa').value.trim();
+        if (!urlVideoFinal) { mostrarMensaje('red', '⚠️ Ingresa la URL del recurso.'); return; }
+        guardarEnSheets();
+      }
+    }
+
+    function subirACloudinary(archivo, callback) {
+      var CLOUD_NAME = 'denrgxzvw';
+      var UPLOAD_PRESET = 'consejo-padres';
+      var formData = new FormData();
+      formData.append('file', archivo);
+      formData.append('upload_preset', UPLOAD_PRESET);
+      formData.append('folder', 'consejo-padres/videos');
+
+      var wrap = document.getElementById('barra-progreso-wrap');
+      var barra = document.getElementById('barra-progreso');
+      wrap.style.display = 'block';
+
+      var tipo = (archivo.type || '').toLowerCase();
+      var endpoint;
+      var resourceBase;
+
+      if (tipo.startsWith('video/')) {
+        endpoint = 'video/upload';
+        resourceBase = 'video/upload';
+      } else if (tipo.startsWith('image/')) {
+        endpoint = 'image/upload';
+        resourceBase = 'image/upload';
+      } else {
+        mostrarMensaje('red', '⚠️ Tipo de archivo no soportado. Usa video o imagen.');
+        wrap.style.display = 'none';
+        barra.style.width = '0%';
+        return;
+      }
+
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', 'https://api.cloudinary.com/v1_1/' + CLOUD_NAME + '/' + endpoint);
+
+      xhr.upload.onprogress = function(e) {
+        if (e.lengthComputable) {
+          var pct = Math.round((e.loaded / e.total) * 100);
+          barra.style.width = pct + '%';
+          mostrarMensaje('blue', '☁️ Subiendo... ' + pct + '%');
+        }
+      };
+
+      xhr.onload = function() {
+        if (xhr.status === 200) {
+          var res = JSON.parse(xhr.responseText);
+          var recursoUrl = res.secure_url;
+          var publicId = res.public_id;
+
+          var miniaturaUrl;
+          if (tipo.startsWith('video/')) {
+            miniaturaUrl =
+              'https://res.cloudinary.com/' + CLOUD_NAME +
+              '/video/upload/so_auto,w_400/' + publicId + '.jpg';
+          } else {
+            miniaturaUrl =
+              'https://res.cloudinary.com/' + CLOUD_NAME +
+              '/image/upload/w_400/' + publicId + '.jpg';
+          }
+
+          wrap.style.display = 'none';
+          mostrarMensaje('blue', '✅ Archivo subido. Guardando...');
+          callback(recursoUrl, miniaturaUrl);
+        } else {
+          wrap.style.display = 'none';
+          mostrarMensaje('red', '❌ Error al subir a Cloudinary.');
+        }
+      };
+
+      xhr.onerror = function() {
+        wrap.style.display = 'none';
+        mostrarMensaje('red', '❌ Error de red al subir.');
+      };
+
+      xhr.send(formData);
+    }
+
+    function guardarEnSheets() {
+      var fecha = document.getElementById('fecha').value;
+      if (!fecha) { fecha = new Date().toISOString().split('T')[0]; }
+      var data = {
+        titulo: document.getElementById('titulo').value.trim(),
+        descripcion: document.getElementById('descripcion').value,
+        video_url: urlVideoFinal,     // puede ser video o imagen
+        miniatura_url: miniatura,
+        campana: document.getElementById('campana').value,
+        visible: document.getElementById('visible').value,
+        fecha: fecha
+      };
+      mostrarMensaje('blue', '💾 Guardando en Sheets...');
+      google.script.run
+        .withSuccessHandler(function() {
+          mostrarMensaje('green', '✅ Recurso guardado correctamente.');
+          document.getElementById('titulo').value = '';
+          document.getElementById('descripcion').value = '';
+          document.getElementById('campana').value = '';
+          document.getElementById('fecha').value = '';
+          document.getElementById('url-externa').value = '';
+          document.getElementById('miniatura-externa').value = '';
+          document.getElementById('archivo-video').value = '';
+          document.getElementById('preview-video').style.display = 'none';
+          document.getElementById('preview-image').style.display = 'none';
+          document.getElementById('barra-progreso-wrap').style.display = 'none';
+          document.getElementById('barra-progreso').style.width = '0%';
+          document.getElementById('url-cloudinary').value = '';
+          document.getElementById('miniatura-cloudinary').value = '';
+          urlVideoFinal = ''; miniatura = '';
+        })
+        .withFailureHandler(function(e) {
+          mostrarMensaje('red', '❌ Error: ' + e.message);
+        })
+        .guardarVideo(data);
+    }
+
+    function mostrarMensaje(color, texto) {
+      var el = document.getElementById('mensaje');
+      el.style.color = color;
+      el.innerText = texto;
+    }
+
+    // Fecha de hoy por defecto
+    window.onload = function() {
+      var hoy = new Date().toISOString().split('T')[0];
+      document.getElementById('fecha').value = hoy;
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <title>Asistente IA Manual</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 16px; background: #f5f5f5; }
+    h2 { color: #1e3a5f; font-size: 16px; margin-bottom: 12px; }
+    .card { background: white; padding: 12px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 12px; }
+    label { display: block; font-size: 12px; font-weight: bold; color: #444; margin-bottom: 4px; }
+    input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; box-sizing: border-box; }
+    .btn-ia { width: 100%; padding: 12px; background: linear-gradient(135deg, #6200ea, #311b92); color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 8px; }
+    .btn-save { width: 100%; padding: 12px; background: #1b5e20; color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 10px; display: none; }
+    .preview { margin-top: 15px; border-top: 2px solid #6200ea; padding-top: 10px; display: none; }
+    .bloque-preview { font-size: 12px; background: #eee; padding: 8px; margin-bottom: 5px; border-radius: 4px; border-left: 3px solid #6200ea; }
+    .loading { text-align: center; display: none; font-size: 13px; color: #6200ea; padding: 10px; }
+    .msg { padding: 8px; border-radius: 6px; font-size: 12px; margin-top: 8px; display: none; }
+  </style>
+</head>
+<body>
+  <div style="margin-bottom: 10px;">
+    <button onclick="google.script.run.abrirAsistenteHome()" style="background: none; border: none; color: #1e3a5f; cursor: pointer; font-size: 11px;">🏠 Volver al Inicio</button>
+  </div>
+
+  <h2>🤖 Asistente IA (Manual)</h2>
+  <p style="font-size: 11px; color: #666; margin-bottom: 10px;">Escribe un tema y la IA buscará en el manual para redactar los bloques automáticamente.</p>
+
+  <div class="card">
+    <label>¿Sobre qué quieres escribir?</label>
+    <input type="text" id="aspecto" placeholder="Ej: Uniformes, Faltas leves, Derechos...">
+    <button class="btn-ia" id="btn-ia" onclick="generar()">✨ Generar Contenido</button>
+  </div>
+
+  <div id="loading" class="loading">🧠 Consultando al Manual...</div>
+  <div id="msg" class="msg"></div>
+
+  <div id="preview" class="preview">
+    <label>VISTA PREVIA:</label>
+    <div id="tema-pre" style="font-weight: bold; color: #1e3a5f; margin-bottom: 10px;"></div>
+    <div id="bloques-pre"></div>
+    <button class="btn-save" id="btn-save" onclick="guardar()">💾 Todo correcto, guardar en Sheets</button>
+  </div>
+
+  <script>
+    var datosGenerados = null;
+
+    function generar() {
+      var aspecto = document.getElementById('aspecto').value.trim();
+      if (!aspecto) return;
+
+      document.getElementById('btn-ia').disabled = true;
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('preview').style.display = 'none';
+      document.getElementById('msg').style.display = 'none';
+
+      google.script.run
+        .withSuccessHandler(function(res) {
+          datosGenerados = res;
+          document.getElementById('btn-ia').disabled = false;
+          document.getElementById('loading').style.display = 'none';
+          mostrarPreview(res);
+        })
+        .withFailureHandler(function(err) {
+          document.getElementById('btn-ia').disabled = false;
+          document.getElementById('loading').style.display = 'none';
+          mostrarMsg('err', '❌ Error: ' + err.message);
+        })
+        .generarContenidoManualIA(aspecto);
+    }
+
+    function mostrarPreview(res) {
+      document.getElementById('preview').style.display = 'block';
+      document.getElementById('btn-save').style.display = 'block';
+      document.getElementById('tema-pre').innerText = "TEMA: " + res.tema.titulo;
+      
+      var htmlBloques = "";
+      res.bloques.forEach(function(b) {
+        htmlBloques += '<div class="bloque-preview"><b>' + b.titulo + '</b><br>' + b.contenido.substring(0, 100) + '...</div>';
+      });
+      document.getElementById('bloques-pre').innerHTML = htmlBloques;
+    }
+
+    function guardar() {
+      if (!datosGenerados) return;
+      document.getElementById('btn-save').disabled = true;
+      mostrarMsg('ok', '💾 Guardando en la Sheet...');
+
+      google.script.run
+        .withSuccessHandler(function(res) {
+          if (res.ok) {
+            mostrarMsg('ok', '✅ ' + res.msg);
+            document.getElementById('btn-save').style.display = 'none';
+            document.getElementById('aspecto').value = '';
+          } else {
+            mostrarMsg('err', '❌ ' + res.msg);
+            document.getElementById('btn-save').disabled = false;
+          }
+        })
+        .withFailureHandler(function(err) {
+          mostrarMsg('err', '❌ Error: ' + err.message);
+          document.getElementById('btn-save').disabled = false;
+        })
+        .guardarTodoIA(datosGenerados);
+    }
+
+    function mostrarMsg(tipo, txt) {
+      var el = document.getElementById('msg');
+      el.className = 'msg ' + (tipo === 'ok' ? 'ok' : 'err');
+      el.innerText = txt;
+      el.style.display = 'block';
+    }
+  </script>
+</body>
+</html>

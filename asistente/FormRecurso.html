@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <title>Agregar Recurso</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 16px;
+      background: #f5f5f5;
+    }
+
+    h2 {
+      color: #1e3a5f;
+      font-size: 16px;
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: bold;
+      color: #444;
+      margin-bottom: 4px;
+      margin-top: 10px;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 13px;
+      background: white;
+      box-sizing: border-box;
+    }
+
+    textarea {
+      height: 70px;
+      resize: vertical;
+    }
+
+    .fila2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 10px;
+      background: #1e3a5f;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: bold;
+      margin-top: 14px;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background: #2d5a8f;
+    }
+
+    .msg {
+      padding: 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      margin-top: 8px;
+      display: none;
+    }
+
+    .ok {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .err {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    #barra-progreso-wrap {
+      margin-top: 8px;
+      display: none;
+    }
+
+    #barra-progreso {
+      height: 8px;
+      background: #1e3a5f;
+      border-radius: 4px;
+      width: 0%;
+      transition: width 0.3s;
+    }
+  </style>
+</head>
+
+<body>
+  <div style="margin-bottom: 15px;">
+    <button onclick="google.script.run.abrirAsistenteHome()" style="background: #eee; border: 1px solid #ccc; border-radius: 4px; color: #1e3a5f; cursor: pointer; font-size: 11px; padding: 4px 8px; font-weight: bold;">
+      🏠 Volver al Inicio
+    </button>
+  </div>
+
+  <h2>📂 Agregar Recurso</h2>
+
+  <div class="fila2">
+    <div>
+      <label>Tipo *</label>
+      <select id="tipo">
+        <option value="Documento">Documento (PDF)</option>
+        <option value="Video">Video</option>
+        <option value="Enlace Web">Enlace Web</option>
+        <option value="Imagen">Imagen</option>
+        <option value="Audio">Audio</option>
+      </select>
+    </div>
+    <div>
+      <label>Actividad Relacionada</label>
+      <select id="id_actividad">
+        <option value="">Cargando actividades...</option>
+      </select>
+    </div>
+  </div>
+
+  <label>Título *</label>
+  <input type="text" id="titulo" placeholder="Nombre del recurso">
+
+  <label>Audiencia</label>
+  <select id="audiencia">
+    <option value="Todos">Todos</option>
+    <option value="Estudiantes">Estudiantes</option>
+    <option value="Docentes">Docentes</option>
+    <option value="Padres">Padres de Familia</option>
+  </select>
+
+  <!-- Origen del recurso -->
+  <div id="seccion-url" style="margin-top: 15px;">
+    <label>Origen del recurso</label>
+    <div style="display:flex; gap:8px; margin-top:4px;">
+      <button type="button" class="btn-origen active" data-modo="upload" style="flex:1;background:white;color:#1e3a5f;border:2px solid #1e3a5f;font-size:12px;padding:6px;border-radius:6px;cursor:pointer;">
+        ⬆ Subir archivo
+      </button>
+      <button type="button" class="btn-origen" data-modo="url" style="flex:1;background:white;color:#1e3a5f;border:2px solid #1e3a5f;font-size:12px;padding:6px;border-radius:6px;cursor:pointer;">
+        🔗 URL externa
+      </button>
+    </div>
+
+    <!-- Panel subir archivo (PDF) -->
+    <div id="panel-upload" style="margin-top:8px;padding:10px;background:#e8eaf6;border-radius:6px;">
+      <label>Archivo (PDF, Imagen, Video o Audio)</label>
+      <input type="file" id="archivo-pdf" accept="application/pdf,image/*,video/*,audio/*">
+      <div id="msg-subida" style="font-size:11px; color:#1e3a5f; margin-top:5px;"></div>
+    </div>
+
+    <!-- Panel URL manual -->
+    <div id="panel-url" style="display:none;margin-top:8px;padding:10px;background:#e8eaf6;border-radius:6px;">
+      <label>URL del recurso *</label>
+      <input type="url" id="url" placeholder="https://...">
+    </div>
+  </div>
+
+  <!-- Configuración de visualización -->
+  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; background: #e8eaf6; padding: 10px; border-radius: 8px; margin-top: 15px;">
+    <div>
+      <label>¿Visible?</label>
+      <select id="visible">
+        <option value="si">Sí</option>
+        <option value="no">No</option>
+      </select>
+    </div>
+    <div>
+      <label>¿Destacado?</label>
+      <select id="destacado">
+        <option value="no">No</option>
+        <option value="si">Sí</option>
+      </select>
+    </div>
+    <div>
+      <label>¿Carrusel?</label>
+      <select id="carrusel">
+        <option value="no">No</option>
+        <option value="si">Sí</option>
+      </select>
+    </div>
+  </div>
+
+  <label>Imagen para Carrusel (Opcional)</label>
+  <input type="url" id="imagen_carrusel" placeholder="https://res.cloudinary.com/...">
+
+  <div id="msg" class="msg"></div>
+  <button class="btn" id="btn-save" onclick="guardar()">💾 Guardar Recurso</button>
+
+  <script>
+    var modoOrigen = 'upload';
+    const FALLBACK_IMAGES = {
+      'Documento': 'https://images.unsplash.com/photo-1544377193-33dcf4d68fb5?w=500&auto=format&fit=crop&q=60',
+      'Video': 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=500&auto=format&fit=crop&q=60',
+      'Juego': 'https://images.unsplash.com/photo-1596464716127-f2a82984de30?w=500&auto=format&fit=crop&q=60',
+      'Audio': 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&auto=format&fit=crop&q=60'
+    };
+
+    function generarMiniaturaVideo(url) {
+      if (url.includes('/video/upload/')) {
+        return url.replace('/video/upload/', '/video/upload/w_600,c_fill,g_auto,f_jpg,so_auto/')
+                  .replace('.mp4', '.jpg')
+                  .replace('.webm', '.jpg')
+                  .replace('.mov', '.jpg');
+      }
+      return url;
+    }
+
+    function cargarActividades() {
+      google.script.run.withSuccessHandler(function(actividades) {
+        var select = document.getElementById('id_actividad');
+        select.innerHTML = '<option value="">-- Sin actividad (General) --</option>';
+        actividades.forEach(function(a) {
+          var opt = document.createElement('option');
+          opt.value = a.id;
+          opt.text = a.titulo;
+          select.appendChild(opt);
+        });
+      }).obtenerListaActividades();
+    }
+
+    function actualizarEstadoUrl() {
+      if (modoOrigen === 'upload') {
+        document.getElementById('panel-upload').style.display = 'block';
+        document.getElementById('panel-url').style.display = 'none';
+      } else {
+        document.getElementById('panel-upload').style.display = 'none';
+        document.getElementById('panel-url').style.display = 'block';
+      }
+    }
+
+    document.querySelectorAll('.btn-origen').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        modoOrigen = this.dataset.modo;
+        document.querySelectorAll('.btn-origen').forEach(function(b){
+          b.classList.remove('active');
+          b.style.background = 'white';
+          b.style.color = '#1e3a5f';
+        });
+        this.classList.add('active');
+        this.style.background = '#1e3a5f';
+        this.style.color = 'white';
+        actualizarEstadoUrl();
+      });
+    });
+
+    function guardar() {
+      var titulo = document.getElementById('titulo').value.trim();
+      if (!titulo) { mostrar('err', '⚠️ El título es obligatorio.'); return; }
+
+      if (modoOrigen === 'upload') {
+        var archivo = document.getElementById('archivo-pdf').files[0];
+        if (!archivo) { mostrar('err', '⚠️ Selecciona un archivo.'); return; }
+        
+        var tipo = (archivo.type || '').toLowerCase();
+        if (tipo === 'application/pdf') {
+          mostrar('ok', '☁️ Subiendo PDF a Drive...');
+          subirPdfADrive(archivo, function(urlDrive) {
+            if (!document.getElementById('imagen_carrusel').value) {
+               var tipoRecurso = document.getElementById('tipo').value;
+               document.getElementById('imagen_carrusel').value = FALLBACK_IMAGES[tipoRecurso] || FALLBACK_IMAGES['Documento'];
+            }
+            guardarEnSheets(urlDrive);
+          });
+        } else if (tipo.startsWith('image/') || tipo.startsWith('video/') || tipo.startsWith('audio/')) {
+          mostrar('ok', '☁️ Subiendo multimedia a Cloudinary...');
+          subirImagenACloudinary(archivo, function(mediaUrl) {
+            var thumbUrl = generarMiniaturaVideo(mediaUrl);
+            
+            // Si es audio, usamos la imagen de respaldo de Audio
+            if (tipo.startsWith('audio/')) {
+              thumbUrl = FALLBACK_IMAGES['Audio'];
+            }
+            
+            document.getElementById('imagen_carrusel').value = thumbUrl;
+            guardarEnSheets(mediaUrl);
+          });
+        } else {
+          mostrar('err', '⚠️ Solo se admiten PDFs, Imágenes, Videos o Audios.');
+        }
+      } else {
+        var urlManual = document.getElementById('url').value.trim();
+        if (!urlManual) { mostrar('err', '⚠️ La URL es obligatoria.'); return; }
+        guardarEnSheets(urlManual);
+      }
+    }
+
+    function guardarEnSheets(urlFinal) {
+      var data = {
+        titulo: document.getElementById('titulo').value.trim(),
+        tipo: document.getElementById('tipo').value,
+        audiencia: document.getElementById('audiencia').value,
+        link: urlFinal,
+        id_actividad: document.getElementById('id_actividad').value,
+        visible: document.getElementById('visible').value,
+        destacado: document.getElementById('destacado').value,
+        carrusel: document.getElementById('carrusel').value,
+        imagen_carrusel: document.getElementById('imagen_carrusel').value || (urlFinal.match(/\.(jpg|jpeg|png|webp|gif)/i) ? urlFinal : '')
+      };
+      
+      console.log("Datos a enviar:", data);
+      
+      mostrar('ok', '💾 Guardando en Sheets...');
+      google.script.run
+        .withSuccessHandler(function(r) {
+          mostrar('ok', '✅ ' + r.msg);
+          setTimeout(function() { google.script.run.abrirAsistenteHome(); }, 1500);
+        })
+        .withFailureHandler(function(e) {
+          mostrar('err', '❌ Error: ' + e.message);
+        })
+        .guardarRecurso(data);
+    }
+
+    function subirPdfADrive(archivo, callback) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var base64 = e.target.result.split(',')[1];
+        google.script.run
+          .withSuccessHandler(function(urlDrive) {
+            callback(urlDrive);
+          })
+          .subirPdfADriveGS({ base64: base64, name: archivo.name, type: archivo.type });
+      };
+      reader.readAsDataURL(archivo);
+    }
+
+    function subirImagenACloudinary(archivo, callback) {
+      var CLOUD_NAME = 'denrgxzvw';
+      var UPLOAD_PRESET = 'consejo-padres';
+      var formData = new FormData();
+      formData.append('file', archivo);
+      formData.append('upload_preset', UPLOAD_PRESET);
+      formData.append('folder', 'orientacion/recursos');
+
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', 'https://api.cloudinary.com/v1_1/' + CLOUD_NAME + '/auto/upload');
+      xhr.onload = function() {
+        if (xhr.status === 200) {
+          var res = JSON.parse(xhr.responseText);
+          callback(res.secure_url);
+        } else {
+          mostrar('err', '❌ Error al subir imagen.');
+        }
+      };
+      xhr.send(formData);
+    }
+
+    function limpiar() {
+      ['titulo','audiencia','link','archivo-pdf'].forEach(function(id){
+        var el = document.getElementById(id);
+        if (el) el.value = '';
+      });
+    }
+
+    function mostrar(tipo, txt) {
+      var el = document.getElementById('msg');
+      el.className = 'msg ' + tipo;
+      el.innerText = txt;
+      el.style.display = 'block';
+    }
+
+    window.onload = function() {
+      cargarActividades();
+    };
+  </script>
+</body>
+
+</html>

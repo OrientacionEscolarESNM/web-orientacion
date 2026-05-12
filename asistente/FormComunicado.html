@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <title>Agregar Comunicado</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 16px;
+      background: #f5f5f5;
+    }
+    h2 {
+      color: #1e3a5f;
+      font-size: 16px;
+      margin-bottom: 16px;
+    }
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: bold;
+      color: #444;
+      margin-bottom: 4px;
+      margin-top: 10px;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 13px;
+      background: white;
+      box-sizing: border-box;
+    }
+    textarea {
+      height: 70px;
+      resize: vertical;
+    }
+    .fila2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .btn {
+      width: 100%;
+      padding: 10px;
+      background: #1e3a5f;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: bold;
+      margin-top: 14px;
+      cursor: pointer;
+    }
+    .btn:hover {
+      background: #2d5a8f;
+    }
+    .msg {
+      padding: 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      margin-top: 8px;
+      display: none;
+    }
+    .ok {
+      background: #d4edda;
+      color: #155724;
+    }
+    .err {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    #barra-progreso-wrap {
+      margin-top: 8px;
+      display: none;
+    }
+    #barra-progreso {
+      height: 8px;
+      background: #1e3a5f;
+      border-radius: 4px;
+      width: 0%;
+      transition: width 0.3s;
+    }
+  </style>
+</head>
+<body>
+  <div style="margin-bottom: 15px;">
+    <button onclick="google.script.run.abrirAsistenteHome()" style="background: #eee; border: 1px solid #ccc; border-radius: 4px; color: #1e3a5f; cursor: pointer; font-size: 11px; padding: 4px 8px; font-weight: bold;">
+      🏠 Volver al Inicio
+    </button>
+  </div>
+
+  <h2>📢 Agregar Comunicado</h2>
+
+  <div class="fila2">
+    <div>
+      <label>Fecha *</label>
+      <input type="date" id="fecha">
+    </div>
+    <div>
+      <label>Título *</label>
+      <input type="text" id="titulo" placeholder="Título del anuncio">
+    </div>
+  </div>
+
+  <label>Descripción / Contenido</label>
+  <textarea id="descripcion" placeholder="Describe brevemente el anuncio..."></textarea>
+
+  <label>Enlace de interés (opcional)</label>
+  <input type="url" id="link" placeholder="https://...">
+
+  <!-- Adjunto PDF o imagen -->
+  <label>Imagen / Video / PDF (Opcional)</label>
+  <div style="display: flex; gap: 8px;">
+    <input type="file" id="archivo" accept="image/*,video/*,application/pdf" style="flex: 1;">
+  </div>
+
+  <div id="barra-progreso-wrap">
+    <div style="font-size:11px;margin-bottom:3px;">Subiendo archivo...</div>
+    <div style="background:#ddd;border-radius:4px;">
+      <div id="barra-progreso"></div>
+    </div>
+  </div>
+
+  <label>URL Imagen Portada (Automático o manual)</label>
+  <input type="url" id="imagen_portada" placeholder="https://res.cloudinary.com/...">
+
+  <div class="fila2">
+    <div>
+      <label>Visible</label>
+      <select id="visible">
+        <option value="si">Sí</option>
+        <option value="no">No</option>
+      </select>
+    </div>
+    <div>
+      <label>Destacado (Carrusel)</label>
+      <select id="destacado">
+        <option value="no">No</option>
+        <option value="si">Sí</option>
+      </select>
+    </div>
+  </div>
+
+  <div id="msg" class="msg"></div>
+  <button class="btn" onclick="guardar()">💾 Guardar Comunicado</button>
+
+  <script>
+    window.onload = function() {
+      document.getElementById('fecha').value = new Date().toISOString().split('T')[0];
+    };
+
+    function generarMiniaturaVideo(url) {
+      if (url.includes('/video/upload/')) {
+        return url.replace('/video/upload/', '/video/upload/w_600,c_fill,g_auto,f_jpg,so_auto/')
+                  .replace('.mp4', '.jpg')
+                  .replace('.webm', '.jpg')
+                  .replace('.mov', '.jpg');
+      }
+      return url;
+    }
+
+    function guardar() {
+      var titulo = document.getElementById('titulo').value.trim();
+      if (!titulo) { mostrar('err', '⚠️ El título es obligatorio.'); return; }
+
+      var archivo = document.getElementById('archivo').files[0];
+      var linkManual = document.getElementById('link').value.trim();
+      var imagenManual = document.getElementById('imagen_portada').value.trim();
+      
+      if (archivo) {
+        var tipo = (archivo.type || '').toLowerCase();
+        if (tipo === 'application/pdf') {
+          mostrar('ok', '☁️ Subiendo PDF a Drive...');
+          subirArchivoADrive(archivo, function(urlDrive) {
+            // El PDF es el link principal. Si hay imagen manual se usa, si no, miniatura genérica.
+            guardarEnSheets(urlDrive, imagenManual); 
+          });
+        } else if (tipo.startsWith('image/') || tipo.startsWith('video/')) {
+          mostrar('ok', '☁️ Subiendo multimedia a Cloudinary...');
+          subirImagenACloudinary(archivo, function(mediaUrl) {
+            var thumbUrl = generarMiniaturaVideo(mediaUrl);
+            var manualLink = document.getElementById('link').value.trim();
+            guardarEnSheets(thumbUrl, manualLink || mediaUrl);
+          });
+        } else {
+          mostrar('err', '⚠️ Solo se admiten PDFs, Imágenes o Videos.');
+        }
+      } else {
+        // Guardado manual sin archivo
+        if (!linkManual && !imagenManual) {
+          mostrar('err', '⚠️ Debes subir un archivo o poner un enlace/imagen manual.');
+          return;
+        }
+        guardarEnSheets(linkManual, imagenManual);
+      }
+    }
+
+    function guardarEnSheets(linkFinal, imagenFinal) {
+      var data = {
+        fecha: document.getElementById('fecha').value,
+        titulo: document.getElementById('titulo').value.trim(),
+        descripcion: document.getElementById('descripcion').value,
+        link: linkFinal,
+        imagen_portada: imagenFinal,
+        visible: document.getElementById('visible').value,
+        destacado: document.getElementById('destacado').value
+      };
+      
+      mostrar('ok', '💾 Guardando...');
+      google.script.run
+        .withSuccessHandler(function(r) { mostrar('ok', '✅ ' + r.msg); limpiar(); })
+        .withFailureHandler(function(e) { mostrar('err', '❌ Error: ' + e.message); })
+        .guardarComunicado(data);
+    }
+
+    function subirArchivoADrive(archivo, callback) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var base64 = e.target.result.split(',')[1];
+        google.script.run
+          .withSuccessHandler(function(url) { callback(url); })
+          .subirPdfADriveGS({ base64: base64, name: archivo.name, type: archivo.type });
+      };
+      reader.readAsDataURL(archivo);
+    }
+
+    function subirImagenACloudinary(archivo, callback) {
+      var CLOUD_NAME = 'denrgxzvw';
+      var UPLOAD_PRESET = 'consejo-padres';
+      var formData = new FormData();
+      formData.append('file', archivo);
+      formData.append('upload_preset', UPLOAD_PRESET);
+      formData.append('folder', 'consejo-padres/comunicados');
+
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', 'https://api.cloudinary.com/v1_1/' + CLOUD_NAME + '/image/upload');
+      xhr.onload = function() {
+        if (xhr.status === 200) {
+          var res = JSON.parse(xhr.responseText);
+          callback(res.secure_url);
+        } else {
+          mostrar('err', '❌ Error al subir imagen.');
+        }
+      };
+      xhr.send(formData);
+    }
+
+    function limpiar() {
+      ['titulo','descripcion','link','archivo','imagen_portada'].forEach(function(id){
+        var el = document.getElementById(id);
+        if (el) el.value = '';
+      });
+      document.getElementById('fecha').value = new Date().toISOString().split('T')[0];
+    }
+
+    function mostrar(tipo, txt) {
+      var el = document.getElementById('msg');
+      el.className = 'msg ' + tipo;
+      el.innerText = txt;
+      el.style.display = 'block';
+    }
+  </script>
+</body>
+</html>

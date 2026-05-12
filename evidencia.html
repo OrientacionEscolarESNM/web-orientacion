@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subir Evidencia | Orientación Escolar ENSM</title>
+    <link rel="stylesheet" href="assets/css/orientacion.css">
+    <script src="https://code.iconify.design/iconify-icon/1.0.8/iconify-icon.min.js"></script>
+    <style>
+        body { background: #f0f4f8; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .upload-card { background: white; max-width: 500px; width: 100%; border-radius: 24px; box-shadow: 0 20px 60px rgba(30, 58, 95, 0.1); overflow: hidden; padding: 2.5rem; }
+        .header-icon { width: 80px; height: 80px; background: #e3f2fd; color: #1e3a5f; border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 2.5rem; }
+        h1 { font-family: var(--font-display); text-align: center; font-size: 1.8rem; color: #1e3a5f; margin-bottom: 0.5rem; }
+        .challenge-info { background: #f8f9fa; border-left: 4px solid #ff6b6b; padding: 1rem; margin: 1.5rem 0; border-radius: 0 12px 12px 0; }
+        .challenge-info h4 { margin: 0; color: #ff6b6b; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+        .challenge-info p { margin: 5px 0 0; font-weight: 700; color: #333; }
+        
+        .form-group { margin-bottom: 1.2rem; }
+        label { display: block; font-size: 0.85rem; font-weight: 700; color: #555; margin-bottom: 0.5rem; }
+        input, textarea { width: 100%; padding: 0.8rem 1rem; border: 2px solid #eee; border-radius: 12px; font-family: inherit; font-size: 0.95rem; outline: none; transition: 0.3s; }
+        input:focus, textarea:focus { border-color: #1e3a5f; box-shadow: 0 0 0 4px rgba(30, 58, 95, 0.05); }
+
+        .file-upload-area { border: 2px dashed #ccc; border-radius: 12px; padding: 2rem; text-align: center; cursor: pointer; transition: 0.3s; position: relative; }
+        .file-upload-area:hover { border-color: #1e3a5f; background: #f0f7ff; }
+        .file-upload-area.has-file { border-color: #2e7d32; background: #f1f8f1; }
+        #preview-container { display: none; margin-top: 1rem; width: 100%; border-radius: 8px; overflow: hidden; }
+        #preview-img { width: 100%; height: 200px; object-fit: cover; }
+
+        #btn-submit { width: 100%; padding: 1rem; background: #1e3a5f; color: white; border: none; border-radius: 12px; font-weight: 700; font-size: 1rem; cursor: pointer; margin-top: 1rem; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s; }
+        #btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+        
+        #loading-screen { position: fixed; inset: 0; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; }
+        .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #1e3a5f; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 1rem; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div id="loading-screen">
+        <div class="spinner"></div>
+        <p id="loading-txt">Validando acceso...</p>
+    </div>
+
+    <div class="upload-card" id="main-card" style="display: none;">
+        <div class="header-icon">✨</div>
+        <h1>Cumplir Desafío</h1>
+        <p style="text-align: center; color: #666; font-size: 0.9rem;">¡Qué alegría verte por aquí! Sube tu evidencia para el muro.</p>
+
+        <div class="challenge-info">
+            <h4 id="chal-prog">Programa</h4>
+            <p id="chal-title">Cargando reto...</p>
+        </div>
+
+        <form id="upload-form">
+            <div class="form-group">
+                <label>Tu Nombre (Familia)</label>
+                <input type="text" id="parent-name" placeholder="Ej: Familia Pérez García" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Curso del Estudiante</label>
+                <input type="text" id="student-grade" placeholder="Ej: 501, 10-A...">
+            </div>
+
+            <div class="form-group">
+                <label>Un mensaje para la comunidad (Opcional)</label>
+                <textarea id="message" rows="2" placeholder="Cuéntanos cómo les fue..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Tu Evidencia (Foto/Video/Audio)</label>
+                <div class="file-upload-area" id="drop-area" onclick="document.getElementById('file-input').click()">
+                    <div id="upload-prompt">
+                        <iconify-icon icon="mdi:cloud-upload" width="32"></iconify-icon>
+                        <p style="font-size: 0.8rem; margin: 5px 0;">Haz clic para elegir archivo</p>
+                    </div>
+                    <div id="preview-container">
+                        <img id="preview-img" src="">
+                        <p id="file-name" style="font-size: 0.7rem; color: #2e7d32; margin-top: 5px; font-weight: bold;"></p>
+                    </div>
+                    <input type="file" id="file-input" style="display: none;" accept="image/*,video/*,audio/*">
+                </div>
+            </div>
+
+            <button type="submit" id="btn-submit">
+                <span>ENVIAR EVIDENCIA</span>
+                <iconify-icon icon="mdi:send" width="20"></iconify-icon>
+            </button>
+        </form>
+    </div>
+
+    <script>
+        const CLOUD_NAME = 'denrgxzvw';
+        const UPLOAD_PRESET = 'consejo-padres';
+        
+        let token = new URLSearchParams(window.location.search).get('t');
+        let currentChallenge = null;
+
+        window.onload = () => {
+            if (!token) {
+                showError("⚠️ Link inválido. Por favor, usa el enlace que llegó a tu correo.");
+                return;
+            }
+            validarToken();
+        };
+
+        function validarToken() {
+            if (typeof google === 'undefined') {
+                // MODO REMOTO (GitHub)
+                fetch(APP_CONFIG.scriptUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify({ action: 'verificarTokenReto', data: { token: token } })
+                }).then(() => {
+                    // En modo no-cors no podemos validar respuesta, 
+                    // asumiremos éxito para dejar avanzar al padre o pediremos que use link real
+                    currentChallenge = { id_proposito: 'EXT', programa: 'Orientación', reto: 'Cargando detalles...' };
+                    showForm(currentChallenge);
+                });
+                return;
+            }
+
+            google.script.run
+                .withSuccessHandler(r => {
+                    if (r.ok) {
+                        currentChallenge = r.reto;
+                        showForm(r.reto);
+                    } else {
+                        showError(r.msg);
+                    }
+                })
+                .withFailureHandler(e => showError("Error de conexión: " + e.message))
+                .verificarTokenReto(token);
+        }
+
+        function showForm(reto) {
+            document.getElementById('loading-screen').style.display = 'none';
+            document.getElementById('main-card').style.display = 'block';
+            document.getElementById('chal-title').textContent = reto.reto || reto.proposito;
+            document.getElementById('chal-prog').textContent = reto.programa || 'Orientación Escolar';
+        }
+
+        function mostrarExito(msg) {
+            document.getElementById('main-card').innerHTML = `
+                <div style="text-align:center; padding:20px;">
+                    <div style="font-size:4rem; margin-bottom:1rem;">🎉</div>
+                    <h2 style="color:#2e7d32;">¡Logrado!</h2>
+                    <p>${msg}</p>
+                    <p style="font-size:0.8rem; color:#666; margin-top:10px;">Tu participación aparecerá en el muro una vez sea revisada.</p>
+                    <a href="index.html" class="btn btn-primary" style="display:inline-block; margin-top:20px; text-decoration:none;">VOLVER AL INICIO</a>
+                </div>
+            `;
+        }
+
+        function showError(msg) {
+            document.getElementById('loading-screen').innerHTML = `
+                <div style="text-align:center; padding:20px;">
+                    <div style="font-size:3rem; margin-bottom:1rem;">❌</div>
+                    <p style="color:#d32f2f; font-weight:bold;">${msg}</p>
+                    <a href="index.html" style="display:inline-block; margin-top:20px; color:#1e3a5f;">Volver al Inicio</a>
+                </div>
+            `;
+        }
+
+        // Manejo de Archivo
+        document.getElementById('file-input').onchange = function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            document.getElementById('upload-prompt').style.display = 'none';
+            document.getElementById('preview-container').style.display = 'block';
+            document.getElementById('file-name').textContent = "📎 " + file.name;
+            document.getElementById('drop-area').classList.add('has-file');
+
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    document.getElementById('preview-img').src = ev.target.result;
+                    document.getElementById('preview-img').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                document.getElementById('preview-img').style.display = 'none';
+            }
+        };
+
+        // Enviar Formulario
+        document.getElementById('upload-form').onsubmit = async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-submit');
+            const fileInput = document.getElementById('file-input');
+            
+            if (!fileInput.files[0]) {
+                alert("Por favor selecciona una foto, video o audio.");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span>SUBIENDO...</span> <div class="spinner" style="width:15px; height:15px; border-width:2px; margin:0;"></div>';
+
+            try {
+                // 1. Subir a Cloudinary
+                const formData = new FormData();
+                formData.append('file', fileInput.files[0]);
+                formData.append('upload_preset', UPLOAD_PRESET);
+
+                const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const cloudData = await res.json();
+
+                if (!cloudData.secure_url) throw new Error("Fallo en subida");
+
+                // 2. Guardar en Google Sheets
+                const datos = {
+                    token: token,
+                    id_programa: currentChallenge.programa,
+                    id_proposito: currentChallenge.id_proposito,
+                    nombre: document.getElementById('parent-name').value,
+                    grado: document.getElementById('student-grade').value,
+                    mensaje: document.getElementById('message').value,
+                    url_evidencia: cloudData.secure_url
+                };
+
+                if (typeof google !== 'undefined') {
+                    google.script.run
+                        .withSuccessHandler(r => {
+                            if (r.ok) {
+                                mostrarExito(r.msg);
+                            } else {
+                                alert(r.msg);
+                                btn.disabled = false;
+                                btn.innerHTML = '<span>REINTENTAR</span>';
+                            }
+                        })
+                        .guardarEvidenciaReto(datos);
+                } else {
+                    // MODO REMOTO (GitHub)
+                    fetch(APP_CONFIG.scriptUrl, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        body: JSON.stringify({ action: 'guardarEvidenciaReto', data: datos })
+                    }).then(() => {
+                        mostrarExito("¡Evidencia enviada con éxito! Gracias por participar.");
+                    });
+                }
+
+            } catch (err) {
+                alert("Error al subir evidencia: " + err.message);
+                btn.disabled = false;
+                btn.innerHTML = '<span>REINTENTAR</span>';
+            }
+        };
+    </script>
+</body>
+</html>
