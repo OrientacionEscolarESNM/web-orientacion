@@ -103,6 +103,7 @@ class SonariaRadioOrientacion {
     start() {
         this.userWantsPlay = true;
         sessionStorage.setItem('sonariaPlaying', 'true');
+        document.querySelectorAll('.disk-sonaria').forEach(el => el.classList.add('spinning'));
         this.connectStream();
     }
 

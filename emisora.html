@@ -20,6 +20,262 @@
 
     <!-- Iconify -->
     <script src="https://code.iconify.design/iconify-icon/1.0.8/iconify-icon.min.js"></script>
+    
+    <style>
+        /* Mesh Gradient Background for Hero */
+        .premium-hero {
+            background-color: #050d0c;
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(174,45%,15%,1) 0, transparent 50%), 
+                radial-gradient(at 50% 0%, hsla(174,45%,10%,1) 0, transparent 50%), 
+                radial-gradient(at 100% 0%, hsla(174,45%,15%,1) 0, transparent 50%), 
+                radial-gradient(at 50% 50%, hsla(174,45%,5%,1) 0, transparent 50%),
+                url('assets/img/fondo_1.gif');
+            background-size: cover;
+            background-position: center;
+            background-blend-mode: overlay;
+            padding: 12rem 1rem 10rem;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .premium-hero::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 200px;
+            background: linear-gradient(to top, var(--clr-bg), transparent);
+        }
+
+        .acronym-pill-container {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 3rem;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .acronym-pill {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 99px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: 0.3s;
+        }
+
+        .acronym-pill:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--clr-sonaria-neon);
+            transform: translateY(-2px);
+        }
+
+        .acronym-pill .letter {
+            font-weight: 800;
+            color: var(--clr-sonaria-neon);
+            font-size: 1.2rem;
+        }
+
+        .acronym-pill .word {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.7;
+        }
+
+        /* Turntable / Disk Styling */
+        .turntable-container {
+            position: relative;
+            width: 320px;
+            height: 320px;
+            margin: 0 auto 4rem;
+        }
+
+        .turntable-base {
+            position: absolute;
+            inset: -20px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 40px;
+            border: 1px solid rgba(255,255,255,0.05);
+            backdrop-filter: blur(5px);
+        }
+
+        .disk-vinyl {
+            width: 100%;
+            height: 100%;
+            background: #111;
+            border-radius: 50%;
+            padding: 10px;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+            z-index: 2;
+        }
+
+        .disk-vinyl::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: repeating-radial-gradient(
+                circle at center,
+                rgba(255,255,255,0) 0,
+                rgba(255,255,255,0) 2px,
+                rgba(255,255,255,0.03) 3px
+            );
+            pointer-events: none;
+        }
+
+        .disk-art {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            opacity: 0.8;
+        }
+
+        .disk-center-hole {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            background: #050d0c;
+            border-radius: 50%;
+            border: 5px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3;
+        }
+
+        .spinning {
+            animation: record-spin 10s linear infinite;
+        }
+
+        @keyframes record-spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* ABC Cards */
+        .abc-section {
+            padding: 8rem 0;
+            background: var(--clr-bg);
+        }
+
+        .abc-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2.5rem;
+            margin-top: 4rem;
+        }
+
+        .abc-card {
+            background: white;
+            border: 1px solid var(--clr-border);
+            padding: 3rem 2.5rem;
+            border-radius: var(--radius-lg);
+            transition: 0.4s;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .abc-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 60px rgba(26, 77, 74, 0.1);
+            border-color: var(--clr-sonaria-neon);
+        }
+
+        .abc-card .badge {
+            width: 50px;
+            height: 50px;
+            background: var(--clr-sonaria-dark);
+            color: var(--clr-sonaria-neon);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .abc-card h4 {
+            font-family: var(--font-body);
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--clr-primary);
+        }
+
+        .abc-card p {
+            font-size: 0.95rem;
+            color: var(--clr-text-muted);
+            line-height: 1.7;
+        }
+
+        /* Community Section */
+        .community-card {
+            background: var(--clr-sonaria-dark);
+            border-radius: 40px;
+            padding: 4rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            color: white;
+            margin-top: 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .qr-glow {
+            background: white;
+            padding: 2rem;
+            border-radius: 30px;
+            box-shadow: 0 0 40px rgba(93, 185, 177, 0.3);
+            text-align: center;
+        }
+
+        .btn-premium {
+            background: var(--clr-sonaria-neon);
+            color: var(--clr-sonaria-dark);
+            padding: 1.2rem 2.5rem;
+            border-radius: 99px;
+            font-weight: 800;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            transition: 0.3s;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-premium:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(93, 185, 177, 0.4);
+        }
+
+        @media (max-width: 992px) {
+            .abc-grid { grid-template-columns: 1fr; }
+            .community-card { grid-template-columns: 1fr; text-align: center; }
+            .community-card div { display: flex; flex-direction: column; align-items: center; }
+        }
+    </style>
 </head>
 
 <body>
@@ -48,151 +304,72 @@
     </header>
 
     <main>
-        <!-- Emisora Hero -->
-        <section class="emisora-hero">
+        <!-- Premium Hero -->
+        <section class="premium-hero">
             <div class="container">
-                <h1 class="emisora-title">Sonaría</h1>
+                <h1 class="emisora-title no-reveal">Sonaría</h1>
                 
-                <!-- Spinning Record / Disk -->
-                <div class="disk-sonaria no-reveal">
-                    <img src="assets/img/logo_sonaria.png" alt="Logo Sonaría" class="disk-inner">
-                    <div class="disk-center"></div>
+                <div class="turntable-container no-reveal">
+                    <div class="turntable-base"></div>
+                    <div class="disk-vinyl disk-sonaria">
+                        <img src="assets/img/logo_sonaria.png" alt="Vinyl Art" class="disk-art">
+                        <div class="disk-center-hole">
+                            <iconify-icon icon="mdi:music-note" style="color: var(--clr-sonaria-neon);"></iconify-icon>
+                        </div>
+                    </div>
                 </div>
 
-                <span class="emisora-acronym">SISTEMA ORIENTADOR NORMALISTA DE APOYO RADIAL IA</span>
-
-                <div class="acronym-grid">
-                    <div class="acronym-item">
-                        <span class="acronym-letter">S</span>
-                        <span class="acronym-text">Sistema</span>
-                    </div>
-                    <div class="acronym-item">
-                        <span class="acronym-letter">O</span>
-                        <span class="acronym-text">Orientador</span>
-                    </div>
-                    <div class="acronym-item">
-                        <span class="acronym-letter">N</span>
-                        <span class="acronym-text">Normalista</span>
-                    </div>
-                    <div class="acronym-item">
-                        <span class="acronym-letter">A</span>
-                        <span class="acronym-text">Apoyo</span>
-                    </div>
-                    <div class="acronym-item">
-                        <span class="acronym-letter">R</span>
-                        <span class="acronym-text">Radial</span>
-                    </div>
-                    <div class="acronym-item">
-                        <span class="acronym-letter">IA</span>
-                        <span class="acronym-text">Inteligencia Artificial</span>
-                    </div>
+                <div class="acronym-pill-container no-reveal">
+                    <div class="acronym-pill"><span class="letter">S</span><span class="word">Sistema</span></div>
+                    <div class="acronym-pill"><span class="letter">O</span><span class="word">Orientador</span></div>
+                    <div class="acronym-pill"><span class="letter">N</span><span class="word">Normalista</span></div>
+                    <div class="acronym-pill"><span class="letter">A</span><span class="word">Apoyo</span></div>
+                    <div class="acronym-pill"><span class="letter">R</span><span class="word">Radial</span></div>
+                    <div class="acronym-pill"><span class="letter">IA</span><span class="word">Inteligencia Artificial</span></div>
                 </div>
             </div>
         </section>
 
-        <!-- Propósito Section -->
-        <section class="emisora-section">
-            <div class="container">
-                <div class="grid" style="grid-template-columns: 1fr 1.2fr; gap: 4rem; align-items: center;">
-                    <div>
-                        <span class="vibrant-tag">Nuestra Esencia</span>
-                        <h2 style="font-size: 3.5rem; margin-bottom: 2rem;">Más que música, <br><em>una conexión</em>
-                        </h2>
-                        <p style="font-size: 1.15rem; color: var(--clr-text-muted); line-height: 1.8;">
-                            Sonaría nace como un puente entre la tecnología y el bienestar emocional. Es la voz de la
-                            Escuela Normal Superior de Monterrey que te acompaña 24/7, utilizando inteligencia
-                            artificial para entender tus estados de ánimo y ofrecerte el apoyo radial que necesitas en
-                            cada momento del día.
-                        </p>
-                    </div>
-                    <div class="glass-card">
-                        <h3 style="margin-bottom: 1.5rem; font-size: 2rem;">¿Por qué escucharnos?</h3>
-                        <ul style="list-style: none; display: flex; flex-direction: column; gap: 1.5rem;">
-                            <li style="display: flex; gap: 1rem;">
-                                <iconify-icon icon="mdi:check-circle"
-                                    style="color: var(--clr-sonaria-neon); font-size: 1.5rem;"></iconify-icon>
-                                <span><strong>Acompañamiento constante:</strong> Nunca estás solo en tu proceso
-                                    educativo.</span>
-                            </li>
-                            <li style="display: flex; gap: 1rem;">
-                                <iconify-icon icon="mdi:check-circle"
-                                    style="color: var(--clr-sonaria-neon); font-size: 1.5rem;"></iconify-icon>
-                                <span><strong>Contenido Curado:</strong> Cápsulas de orientación, salud mental y buena
-                                    música.</span>
-                            </li>
-                            <li style="display: flex; gap: 1rem;">
-                                <iconify-icon icon="mdi:check-circle"
-                                    style="color: var(--clr-sonaria-neon); font-size: 1.5rem;"></iconify-icon>
-                                <span><strong>Innovación IA:</strong> Un sistema que aprende y evoluciona con la
-                                    comunidad.</span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Cómo usar Section (ABC) -->
-        <section class="emisora-section" style="background: white;">
+        <!-- ABC Section -->
+        <section class="abc-section">
             <div class="container">
                 <div class="section-header no-reveal">
-                    <span class="vibrant-tag">Manual de Usuario</span>
-                    <h3>El A, B, C de la Interacción</h3>
-                    <p>Sintoniza, participa y personaliza tu experiencia radial.</p>
+                    <span class="vibrant-tag">Manual de Experiencia</span>
+                    <h2 style="font-size: 3.5rem;">El A, B, C de Sonaría</h2>
+                    <p>Sintoniza con tus sentidos y conéctate con la señal que transforma.</p>
                 </div>
 
-                <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 4rem;">
-                    <div class="steps-container">
-                        <div class="step-card">
-                            <span class="step-number">A</span>
-                            <div class="step-content">
-                                <h4>Pide tu Música (/pedir)</h4>
-                                <p>Escribe <code>/pedir</code> seguido del nombre de tu canción favorita en nuestro bot
-                                    de Telegram. ¡La IA la buscará y la pondrá en la cola!</p>
-                            </div>
-                        </div>
-                        <div class="step-card">
-                            <span class="step-number">B</span>
-                            <div class="step-content">
-                                <h4>Sugiere un Estilo (/sugerir)</h4>
-                                <p>¿No sabes qué escuchar? Escribe <code>/sugerir</code> y pide un género o estado de
-                                    ánimo. El DJ IA armará una lista de 10 canciones para ti.</p>
-                            </div>
-                        </div>
-                        <div class="step-card">
-                            <span class="step-number">C</span>
-                            <div class="step-content">
-                                <h4>Envía una Dedicatoria (/dedicatoria)</h4>
-                                <p>Usa el comando <code>/dedicatoria</code>. Podrás grabar un mensaje o escribirlo para
-                                    que la IA lo lea al aire antes de tu canción.</p>
-                            </div>
-                        </div>
+                <div class="abc-grid">
+                    <div class="abc-card no-reveal">
+                        <div class="badge">A</div>
+                        <h4>Pide tu Música</h4>
+                        <p>¿Tienes esa canción que te levanta el ánimo? Usa el comando <code>/pedir</code> en nuestro Telegram. Nuestra IA la procesa y la pone a sonar para toda la comunidad.</p>
                     </div>
+                    <div class="abc-card no-reveal">
+                        <div class="badge">B</div>
+                        <h4>Explora Géneros</h4>
+                        <p>Usa <code>/sugerir</code> cuando necesites algo nuevo. Cuéntale a la IA cómo te sientes (alegre, relajado, enfocado) y ella diseñará una sesión musical única para ti.</p>
+                    </div>
+                    <div class="abc-card no-reveal">
+                        <div class="badge">C</div>
+                        <h4>Dedica y Conecta</h4>
+                        <p>El comando <code>/dedicatoria</code> es magia pura. Escribe un mensaje para alguien especial y nuestra voz IA lo leerá al aire justo antes de que empiece la canción.</p>
+                    </div>
+                </div>
 
-                    <div
-                        style="display: flex; flex-direction: column; justify-content: center; align-items: center; background: var(--clr-sonaria-dark); border-radius: var(--radius-lg); padding: 3rem; color: white; text-align: center; position: relative; overflow: hidden;">
-                        <div
-                            style="position: absolute; inset: 0; background: radial-gradient(circle at 50% 50%, rgba(93, 185, 177, 0.1) 0%, transparent 70%); pointer-events: none;">
-                        </div>
-
-                        <div
-                            style="background: white; padding: 1.5rem; border-radius: 20px; margin-bottom: 2rem; box-shadow: 0 15px 40px rgba(0,0,0,0.3);">
-                            <img src="assets/img/qr_telegram.png" alt="QR Telegram Sonaría"
-                                style="width: 180px; height: 180px; display: block;">
-                        </div>
-
-                        <h3 style="color: white; margin-bottom: 1rem;">¡Únete a la Comunidad!</h3>
-                        <p style="opacity: 0.8; margin-bottom: 2rem;">Escanea el QR o haz clic abajo para entrar al
-                            grupo de Telegram donde ocurre la magia.</p>
-
-                        <a href="https://t.me/sonariaradio_bot" target="_blank" class="btn"
-                            style="background: var(--clr-sonaria-neon); color: var(--clr-sonaria-dark); border: none; font-weight: 800; padding: 1.2rem 2.5rem; border-radius: 99px; text-decoration: none; display: flex; align-items: center; gap: 0.8rem; transition: 0.3s;">
-                            <iconify-icon icon="mdi:send" style="font-size: 1.5rem;"></iconify-icon>
-                            ABRIR TELEGRAM
+                <!-- Community Integration -->
+                <div class="community-card no-reveal">
+                    <div>
+                        <h3 style="font-size: 2.5rem; margin-bottom: 1.5rem; color: white;">Únete al ritmo <br>de la Normal</h3>
+                        <p style="opacity: 0.7; margin-bottom: 2.5rem; font-size: 1.1rem;">Escanea el código QR o haz clic en el botón para entrar a nuestro grupo oficial. Allí es donde la radio cobra vida con tu participación.</p>
+                        <a href="https://t.me/sonariaradio" target="_blank" class="btn-premium">
+                            <iconify-icon icon="mdi:telegram" style="font-size: 1.5rem;"></iconify-icon>
+                            ENTRAR AL GRUPO
                         </a>
-
-                        <span
-                            style="margin-top: 1.5rem; font-family: monospace; color: var(--clr-sonaria-neon); font-size: 0.9rem; letter-spacing: 2px;">@SONARIARADIO_BOT</span>
+                        <p style="margin-top: 1.5rem; font-family: monospace; color: var(--clr-sonaria-neon); letter-spacing: 2px;">@SONARIARADIO</p>
+                    </div>
+                    <div class="qr-glow">
+                        <img src="assets/img/qr_telegram.png" alt="QR Sonaría" style="width: 220px; border-radius: 15px;">
                     </div>
                 </div>
             </div>
@@ -200,23 +377,12 @@
     </main>
 
     <!-- Footer -->
-    <footer class="site-footer" style="background: var(--clr-sonaria-dark); color: white; padding: 6rem 0 4rem;">
+    <footer class="site-footer" style="background: #030707; color: white; padding: 6rem 0 4rem;">
         <div class="container">
-            <div style="text-align: center; max-width: 600px; margin: 0 auto;">
-                <h2 style="color: white; font-size: 3rem; margin-bottom: 1.5rem;">Sonaría</h2>
-                <p style="opacity: 0.6; margin-bottom: 3rem;">El sistema radial que late al ritmo de la Normal Superior
-                    de Monterrey. Un espacio para escucharnos, crecernos y encontrarnos.</p>
-                <div style="display: flex; justify-content: center; gap: 1.5rem; font-size: 1.5rem;">
-                    <a href="#" style="color: white; opacity: 0.8;"><iconify-icon
-                            icon="mdi:instagram"></iconify-icon></a>
-                    <a href="#" style="color: white; opacity: 0.8;"><iconify-icon
-                            icon="mdi:facebook"></iconify-icon></a>
-                    <a href="#" style="color: white; opacity: 0.8;"><iconify-icon icon="mdi:youtube"></iconify-icon></a>
-                </div>
-            </div>
-            <div
-                style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 4rem; padding-top: 2rem; text-align: center; font-size: 0.9rem; opacity: 0.5;">
-                <p>&copy; 2026 Orientación Escolar ENSM. Sonaría es un proyecto de innovación radial.</p>
+            <div style="text-align: center;">
+                <h2 style="color: white; font-size: 2.5rem; margin-bottom: 1rem;">Sonaría</h2>
+                <p style="opacity: 0.5; max-width: 500px; margin: 0 auto 3rem;">Sistema Orientador Normalista de Apoyo Radial IA. <br>Escuela Normal Superior de Monterrey.</p>
+                <p style="font-size: 0.85rem; opacity: 0.3;">&copy; 2026 Orientación Escolar ENSM.</p>
             </div>
         </div>
     </footer>
