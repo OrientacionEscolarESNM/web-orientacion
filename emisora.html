@@ -273,24 +273,26 @@
         }
 
         .qr-wrapper {
-            background: white;
-            padding: 1.8rem;
-            border-radius: 36px;
-            box-shadow: 0 0 60px rgba(93, 185, 177, 0.4);
-            width: 320px;
-            height: 320px;
+            background: transparent;
+            padding: 0;
+            border-radius: 48px;
+            box-shadow: 0 0 80px rgba(93, 185, 177, 0.3);
+            width: 400px;
+            height: 400px;
             overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 auto;
+            border: 1px solid rgba(255,255,255,0.05);
         }
 
         .qr-wrapper img {
-            width: 140%;
-            height: 140%;
+            width: 160%;
+            height: 160%;
             object-fit: cover;
-            object-position: center 20%;
+            object-position: center 22%;
+            filter: contrast(1.1) brightness(1.1);
         }
 
         .btn-premium {
