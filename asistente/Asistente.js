@@ -618,7 +618,7 @@ function registrarRetoAceptado(datos) {
  * Envía el correo electrónico con el link de subida
  */
 function enviarEmailReto(email, token, tituloReto, nombrePrograma) {
-  const urlSubida = `https://consejopadresensm.github.io/web-orientacion/evidencia.html?t=${token}`;
+  const urlSubida = `https://orientacionescolaresnm.github.io/web-orientacion/evidencia.html?t=${token}`;
   
   const htmlBody = `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; border-radius: 12px; overflow: hidden;">
