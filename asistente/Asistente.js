@@ -652,7 +652,7 @@ function enviarEmailReto(email, token, tituloReto, nombrePrograma) {
     </div>
   `;
 
-  GmailApp.sendEmail(email, `🎨 Instrucciones: Tu reto de Orientación está listo`, "", {
+  GmailApp.sendEmail(email, "Instrucciones: Tu reto de Orientación está listo", "", {
     htmlBody: htmlBody,
     name: "Orientación Escolar ENSM"
   });
