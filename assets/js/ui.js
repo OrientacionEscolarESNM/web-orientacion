@@ -41,7 +41,7 @@ async function renderAll() {
         // con <em>, <br> y colores que no pueden venir como texto plano.
         // Si quieres cambiarlo, edita directamente el index.html (línea ~62).
         if (config.hero_subtitle) document.getElementById('hero-subtitle').innerText = config.hero_subtitle;
-        
+
         // Comprobamos que existen antes de modificar (el recuadro fue reemplazado por imagen)
         const nombreEl = document.getElementById('orientadora-nombre');
         const cargoEl = document.getElementById('orientadora-cargo');
@@ -89,15 +89,15 @@ async function renderAll() {
         // --- CARRUSEL GLOBAL (Highlights) ---
         // Se alimenta de Actividades, Recursos y Comunicados que tengan carrusel = SI
         const comunicados = await getSheetData('comunicados');
-        
+
         const highlights = [
             ...(actividades || []).map(a => {
                 const slug = (a.id || a.titulo || '').toString().trim().toLowerCase().replace(/\s+/g, '-');
-                return { 
-                    ...a, 
-                    type: 'Actividad', 
-                    link: a.programa_id ? `programa.html?id=${a.programa_id}#activity-${slug}` : '#agenda', 
-                    imagen: a.imagen_portada || '' 
+                return {
+                    ...a,
+                    type: 'Actividad',
+                    link: a.programa_id ? `programa.html?id=${a.programa_id}#activity-${slug}` : '#agenda',
+                    imagen: a.imagen_portada || ''
                 };
             }),
             ...(window.allRecursos || []).map(r => ({ ...r, type: 'Recurso', link: r.link || '#recursos', imagen: r.imagen_carrusel || r.imagen || '' })),
@@ -144,16 +144,16 @@ function getRecursoIcon(tipo) {
 function createResourceCard(item) {
     const div = document.createElement('div');
     div.className = 'recurso-card';
-    
+
     const isDestacado = (item.destacado || '').toLowerCase() === 'si';
     if (isDestacado) {
         div.classList.add('recurso-destacado');
     }
-    
+
     const icon = getRecursoIcon(item.tipo);
     const actionText = (item.tipo || '').toLowerCase().includes('video') ? 'Ver Video' : 'Acceder';
     const destacadoBadge = isDestacado ? `<span class="recurso-star">★</span>` : '';
-    
+
     div.innerHTML = `
         <div class="recurso-icon">
             ${icon}
@@ -183,7 +183,7 @@ function initRecursosFilters() {
             });
             btn.classList.remove('btn-secondary');
             btn.classList.add('btn-primary', 'active');
-            
+
             // Filtrar y renderizar
             const target = btn.dataset.target;
             const filtered = window.allRecursos.filter(item => {
@@ -217,7 +217,7 @@ function createRutaCard(item) {
     div.style.flexDirection = 'column';
     div.style.height = '100%';
     div.style.transition = 'all 0.3s ease';
-    
+
     // Efecto Hover suave
     div.addEventListener('mouseenter', () => {
         div.style.boxShadow = '0 10px 30px rgba(26, 77, 74, 0.08)';
@@ -227,16 +227,16 @@ function createRutaCard(item) {
         div.style.boxShadow = '0 2px 10px rgba(0,0,0,0.02)';
         div.style.transform = 'translateY(0)';
     });
-    
+
     // Si en la BD hay un link directo a PNG lo usa, si dice 'mdi:' o está vacío, busca la figura automática
     let iconUrl = item.icono || '';
     if (!iconUrl || iconUrl.startsWith('mdi:')) {
         iconUrl = getFlaticonForRuta(item.titulo);
     }
-    
+
     const iconHtml = `<img src="${iconUrl}" alt="${item.titulo}" style="width: 60px; height: 60px; object-fit: contain; margin-bottom: 1.2rem; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));">`;
 
-    
+
     // Parsear Pasos
     let pasosHtml = '';
     let hasPasos = false;
@@ -252,10 +252,10 @@ function createRutaCard(item) {
         });
         pasosHtml += `</ul></div>`;
     }
-    
+
     const linkPasos = item.enlace || item.link || '';
     let actionHtml = '';
-    
+
     if (hasPasos) {
         actionHtml = `<a href="#" class="link-inline toggle-pasos" style="font-size: 0.9rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.4rem;">Ver ruta <span class="arrow" style="transition: transform 0.3s; font-size: 1.1rem;">&rarr;</span></a>`;
     } else if (linkPasos) {
@@ -273,12 +273,12 @@ function createRutaCard(item) {
         </div>
         ${pasosHtml}
     `;
-    
+
     if (hasPasos) {
         const btnToggle = div.querySelector('.toggle-pasos');
         const arrow = div.querySelector('.arrow');
         const stepsContainer = div.querySelector('.steps-container');
-        
+
         btnToggle.addEventListener('click', (e) => {
             e.preventDefault();
             const isOpen = stepsContainer.classList.contains('open');
@@ -327,7 +327,7 @@ function renderHighlights(items) {
         const card = document.createElement('a');
         card.href = item.link || '#';
         card.className = 'highlight-card';
-        
+
         if (item.link && (item.link.startsWith('http') || item.link.startsWith('https'))) {
             card.target = '_blank';
             card.rel = 'noopener noreferrer';
@@ -335,9 +335,9 @@ function renderHighlights(items) {
 
         if (index < clonesCount) card.dataset.clone = 'tail';
         if (index >= infiniteItems.length - clonesCount) card.dataset.clone = 'head';
-        
+
         let img = item.imagen_carrusel || item.imagen_portada || item.imagen;
-        
+
         if (img && img.includes('drive.google.com')) {
             const driveId = img.match(/[-\w]{25,}/);
             if (driveId) img = `https://drive.google.com/uc?id=${driveId[0]}`;
@@ -348,7 +348,7 @@ function renderHighlights(items) {
             const imgL = img.toLowerCase();
             const isImageExt = imgL.endsWith('.jpg') || imgL.endsWith('.jpeg') || imgL.endsWith('.png') || imgL.endsWith('.webp') || imgL.endsWith('.gif');
             const isVideo = (imgL.endsWith('.mp4') || imgL.endsWith('.webm') || imgL.includes('/video/upload/')) && !isImageExt;
-            
+
             if (isVideo) {
                 visualHtml = `
                     <div class="card-visual">
@@ -372,7 +372,7 @@ function renderHighlights(items) {
         }
 
         const resumen = item.descripcion || item.subtitulo || item.resumen || '';
-        const dateHtml = (item.type === 'Actividad' && item.fecha) 
+        const dateHtml = (item.type === 'Actividad' && item.fecha)
             ? `<div class="card-date"><iconify-icon icon="mdi:calendar-clock"></iconify-icon> ${item.fecha}</div>`
             : '';
 
@@ -398,7 +398,7 @@ function renderHighlights(items) {
 
     // --- AUTO-ROTATION LOGIC ---
     let isAutoScrolling = true;
-    
+
     const autoScroll = () => {
         if (!isAutoScrolling) return;
         const step = 380 + 32;
@@ -487,7 +487,7 @@ window.timelineActividades = [];
 function parseSpanishDate(dateStr) {
     if (!dateStr) return new Date(0);
     let s = dateStr.toString().trim().toLowerCase();
-    
+
     if (/^\d{4}-\d{2}-\d{2}/.test(s)) {
         const d = new Date(s + 'T12:00:00');
         if (!isNaN(d.getTime())) return d;
@@ -546,12 +546,12 @@ function renderTimelineByPeriod(actividades, containerId) {
         const colorClass = getPeriodColor(act.periodo);
         const activitySlug = (act.id || act.titulo || '').toString().trim().toLowerCase().replace(/\s+/g, '-');
         const activityLink = act.programa_id ? `programa.html?id=${act.programa_id}#activity-${activitySlug}` : '#agenda';
-        
+
         const titleHtml = `<a href="${activityLink}" class="timeline-title-link">${act.titulo} <iconify-icon icon="mdi:arrow-right-circle" style="font-size: 0.8em; vertical-align: middle; color: var(--clr-primary);"></iconify-icon></a>`;
 
         const desc = act.descripcion || act.resumen || '';
         const badgeClass = act.estado === 'próximo' ? 'badge-next' : (act.estado === 'en curso' ? 'badge-now' : 'badge-done');
-        
+
         html += `
             <div class="timeline-item ${index % 2 === 0 ? 'left' : 'right'}">
                 <div class="timeline-content">
@@ -573,7 +573,7 @@ function renderTimelineByPeriod(actividades, containerId) {
 
 function initTimelineFilters() {
     const buttons = document.querySelectorAll('.timeline-filter-btn');
-    if(buttons.length === 0) return;
+    if (buttons.length === 0) return;
 
     buttons.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -587,14 +587,14 @@ function initTimelineFilters() {
 function filterTimeline(period) {
     const filtered = window.timelineActividades.filter(act => {
         if (period === 'all') return true;
-        
+
         const p = (act.periodo || '').toLowerCase().replace(/\s+/g, '');
         const numPatterns = [period, 'periodo' + period];
         if (period === '1') numPatterns.push('primero', 'periodoprimero', 'primer');
         if (period === '2') numPatterns.push('segundo', 'periodosegundo');
         if (period === '3') numPatterns.push('tercero', 'periodotercero', 'tercer');
         if (period === '4') numPatterns.push('cuarto', 'periodocuarto');
-        
+
         return numPatterns.some(pattern => p.includes(pattern));
     });
 
@@ -605,7 +605,7 @@ function filterTimeline(period) {
 function getPeriodForDate(fecha) {
     const d = parseSpanishDate(fecha);
     if (d.getTime() === 0) return '1'; // Por defecto si no se puede parsear
-    
+
     const month = d.getMonth() + 1;
     const day = d.getDate();
 
@@ -661,7 +661,7 @@ function renderEvidenciasGrid(containerId, items, limit) {
     if (!container) return;
 
     if (!items || items.length === 0) {
-        container.innerHTML = '<p style="text-align: center; color: var(--clr-text-muted); width: 100%; padding: 3rem 0;">Aún no hay evidencias compartidas en el muro. ¡Gira la ruleta, completa tu reto y sé el primero en inspirar a la comunidad!</p>';
+        container.innerHTML = '<p style="text-align: center; color: var(--clr-text-muted); width: 100%; padding: 3rem 0;">Aún no hay evidencias compartidas en el muro. ¡Gira la ruleta, completa tu reto y sé el primero!</p>';
         return;
     }
 
@@ -672,7 +672,7 @@ function renderEvidenciasGrid(containerId, items, limit) {
     displayItems.forEach(item => {
         const div = document.createElement('div');
         div.className = 'evidencia-card';
-        
+
         let mediaHtml = '';
         if (item.url) {
             // Cloudinary usa /video/upload/ para videos y audios. /image/upload/ para fotos.
