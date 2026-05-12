@@ -205,15 +205,15 @@ class Ruleta {
         if (this.isSpinning) return;
         this.isSpinning = true;
         
-        // 1. Activar GIF de movimiento (GIF2) sin ocultar el 1 inmediatamente (evita parpadeo)
+        // 1. Activar GIF de movimiento (GIF2) con cross-fade
         if (this.videoActive) {
             this.restartGif(this.videoActive);
-            this.videoActive.style.display = 'block';
+            this.videoActive.classList.remove('hidden-gif');
             
             // Esperar un instante a que el gif2 "enganche" antes de ocultar el gif1
             setTimeout(() => {
-                if (this.videoIdle) this.videoIdle.style.display = 'none';
-            }, 150);
+                if (this.videoIdle) this.videoIdle.classList.add('hidden-gif');
+            }, 300); // Un poco más de tiempo para el cross-fade suave
         }
         
         console.log("🎡 [Ruleta] GIF2 iniciado. Esperando 5 segundos para girar...");
@@ -245,12 +245,12 @@ class Ruleta {
                         this.isSpinning = false;
                         if (this.videoIdle) {
                             this.restartGif(this.videoIdle);
-                            this.videoIdle.style.display = 'block';
+                            this.videoIdle.classList.remove('hidden-gif');
                             
-                            // Ocultar el activo después de que el idle haya cargado
+                            // Ocultar el activo después de que el idle haya cargado (cross-fade)
                             setTimeout(() => {
-                                if (this.videoActive) this.videoActive.style.display = 'none';
-                            }, 150);
+                                if (this.videoActive) this.videoActive.classList.add('hidden-gif');
+                            }, 300);
                         }
                         this.showResult();
                     }, 800);
