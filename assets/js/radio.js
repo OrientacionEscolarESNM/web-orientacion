@@ -161,8 +161,8 @@ class SonariaRadioOrientacion {
             if (this.userWantsPlay && this.isPlaying && now - this.lastDataTime > 15000) {
                 this.scheduleReconnect("Señal perdida");
             }
-            // Caso 2: Estamos intentando conectar pero no inicia (> 10s)
-            if (this.userWantsPlay && !this.isPlaying && now - this.connectionStartTime > 10000) {
+            // Caso 2: Estamos intentando conectar pero no inicia (> 5s)
+            if (this.userWantsPlay && !this.isPlaying && now - this.connectionStartTime > 5000) {
                 this.scheduleReconnect("Fallo de conexión");
             }
         }, 5000);
