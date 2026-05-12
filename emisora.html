@@ -275,23 +275,28 @@
         .qr-wrapper {
             background: transparent;
             padding: 0;
-            border-radius: 40px;
-            box-shadow: 0 0 100px rgba(93, 185, 177, 0.4);
-            width: 380px;
-            height: 380px;
-            overflow: hidden;
+            width: 360px;
+            height: 360px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 auto;
-            border: 2px solid rgba(93, 185, 177, 0.3);
+            position: relative;
+        }
+
+        .qr-wrapper::before {
+            content: '';
+            position: absolute;
+            inset: -20px;
+            background: radial-gradient(circle at center, var(--clr-sonaria-glow) 0%, transparent 70%);
+            z-index: -1;
         }
 
         .qr-wrapper img {
             width: 100%;
             height: 100%;
             object-fit: contain;
-            filter: brightness(1.1) contrast(1.1);
+            border-radius: 20px;
         }
 
         .btn-premium {
@@ -430,7 +435,7 @@
                             </div>
                         </div>
                         <div class="qr-wrapper">
-                            <img src="assets/img/qr_only.png" alt="QR Sonaría">
+                            <img src="assets/img/qr_telegram.png" alt="QR Sonaría">
                         </div>
                     </div>
                 </div>
