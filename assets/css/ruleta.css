@@ -42,14 +42,6 @@
     /* Máscara más suave y extensa para eliminar bordes rectangulares */
     -webkit-mask-image: radial-gradient(circle at 50% 50%, black 15%, rgba(0,0,0,0.6) 50%, transparent 85%);
     mask-image: radial-gradient(circle at 50% 50%, black 15%, rgba(0,0,0,0.6) 50%, transparent 85%);
-    
-    /* Transición suave para evitar parpadeos */
-    transition: opacity 0.4s ease-in-out;
-}
-
-.video-overlay img.hidden-gif {
-    opacity: 0;
-    pointer-events: none;
 }
 
 /* --- Mano SVG boceto estilo sketch --- */
