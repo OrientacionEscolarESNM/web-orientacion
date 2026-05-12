@@ -18,11 +18,12 @@ function initAnimations() {
     if (typeof ScrollReveal !== 'undefined') {
         const sr = ScrollReveal({
             origin: 'bottom',
-            distance: '20px',
-            duration: 800,
-            delay: 200,
-            easing: 'cubic-bezier(0.5, 0, 0, 1)',
-            interval: 100
+            distance: '15px',
+            duration: 500,
+            delay: 50,
+            easing: 'ease-out',
+            interval: 60,
+            viewFactor: 0.05
         });
 
         sr.reveal('.hero-content > *');
