@@ -195,13 +195,22 @@ class Ruleta {
         return winningIndex;
     }
 
+    restartGif(el) {
+        if (!el) return;
+        const currentSrc = el.src.split('?')[0];
+        el.src = currentSrc + '?t=' + new Date().getTime();
+    }
+
     spin() {
         if (this.isSpinning) return;
         this.isSpinning = true;
         
         // 1. Activar GIF de movimiento (GIF2)
         if (this.videoIdle) this.videoIdle.style.display = 'none';
-        if (this.videoActive) this.videoActive.style.display = 'block';
+        if (this.videoActive) {
+            this.restartGif(this.videoActive);
+            this.videoActive.style.display = 'block';
+        }
         
         console.log("🎡 [Ruleta] GIF2 iniciado. Esperando 5 segundos para girar...");
 
@@ -231,7 +240,10 @@ class Ruleta {
                     setTimeout(() => {
                         this.isSpinning = false;
                         if (this.videoActive) this.videoActive.style.display = 'none';
-                        if (this.videoIdle) this.videoIdle.style.display = 'block';
+                        if (this.videoIdle) {
+                            this.restartGif(this.videoIdle);
+                            this.videoIdle.style.display = 'block';
+                        }
                         this.showResult();
                     }, 800);
                 }
