@@ -1,4 +1,6 @@
 // ==========================================
+// PRUEBA DE CONEXIÓN CLASP - 11 DE MAYO 2026
+// ==========================================
 // CONFIGURACIÓN CLOUDINARY
 // ==========================================
 const CLOUDINARY_CLOUD_NAME = 'denrgxzvw';

@@ -67,6 +67,10 @@ async function renderAll() {
         const normatividad = await getSheetData('normatividad');
         renderCollection('normatividad-container', normatividad, createNormaCard);
 
+        // Renderizar Muro de Evidencias
+        const evidencias = await getEvidencias();
+        renderEvidenciasGrid('evidencias-container', evidencias);
+
         // --- CARRUSEL GLOBAL (Highlights) ---
         // Se alimenta de Actividades, Recursos y Comunicados que tengan carrusel = SI
         const comunicados = await getSheetData('comunicados');
@@ -636,4 +640,47 @@ function observeTimelineItems(container) {
         });
     }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
     items.forEach(item => observer.observe(item));
+}
+
+/* ==================== MURO DE EVIDENCIAS ==================== */
+function renderEvidenciasGrid(containerId, items) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    if (!items || items.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: var(--clr-text-muted); width: 100%; padding: 3rem 0;">Aún no hay evidencias compartidas en el muro. ¡Gira la ruleta, completa tu reto y sé el primero en inspirar a la comunidad!</p>';
+        return;
+    }
+
+    container.innerHTML = '';
+    items.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'evidencia-card';
+        
+        let mediaHtml = '';
+        if (item.url) {
+            // Cloudinary usa /video/upload/ para videos y audios. /image/upload/ para fotos.
+            if (item.url.includes('/video/upload/') || item.url.endsWith('.mp4') || item.url.endsWith('.webm')) {
+                mediaHtml = `<video src="${item.url}" controls preload="metadata" style="width: 100%; display: block; border-radius: var(--radius-sm); outline: none;"></video>`;
+            } else {
+                mediaHtml = `<img src="${item.url}" alt="Evidencia de la comunidad" loading="lazy" style="width: 100%; display: block; border-radius: var(--radius-sm);">`;
+            }
+        }
+
+        const nombreStr = item.nombre || item.nombre_padre || 'Familia ENSM';
+        const gradoStr = item.grado ? `<span class="evidencia-badge">${item.grado}</span>` : '';
+        const mensajeStr = item.mensaje ? `<p class="evidencia-msg">"${item.mensaje}"</p>` : '';
+
+        div.innerHTML = `
+            ${mediaHtml}
+            <div class="evidencia-info">
+                <div class="evidencia-header">
+                    <h5>${nombreStr}</h5>
+                    ${gradoStr}
+                </div>
+                ${mensajeStr}
+            </div>
+        `;
+        container.appendChild(div);
+    });
 }

@@ -12,7 +12,8 @@ const APP_CONFIG = {
         campanas: 'campañas',
         comunicados: 'comunicados',
         recursos: 'recursos',
-        rutas: 'rutas'
+        rutas: 'rutas',
+        evidencias: 'evidencias'
     },
     // URL de la Web App de Google Apps Script (Actualizado vía clasp deploy)
     scriptUrl: 'https://script.google.com/macros/s/AKfycbxioHtjmARaHmIKb6h3B3blBTsDreRqhSvU0Wb-Uq0XVvkKbto8fkMqBfxMwmSf9E_B/exec' 
@@ -252,4 +253,18 @@ async function getConfig() {
         if (item.key) config[item.key] = item.value;
     });
     return config;
+}
+
+/**
+ * Obtiene las evidencias públicas marcadas como visibles
+ */
+async function getEvidencias() {
+    const data = await getSheetData(APP_CONFIG.tabs.evidencias);
+    if (!data || data.length === 0) return [];
+    
+    return data.filter(item => {
+        const v = (item.visible || '').trim().toLowerCase();
+        const isVisible = (v === 'si' || v === 's' || v === 'y' || v === 'yes');
+        return isVisible && item.url;
+    });
 }

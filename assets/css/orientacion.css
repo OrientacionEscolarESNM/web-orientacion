@@ -745,3 +745,79 @@ section {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-10px); }
 }
+
+/* ==================== MURO DE EVIDENCIAS ==================== */
+.masonry-grid {
+    column-count: 3;
+    column-gap: 2rem;
+    padding-bottom: 2rem;
+}
+
+@media (max-width: 992px) {
+    .masonry-grid { column-count: 2; column-gap: 1.5rem; }
+}
+
+@media (max-width: 576px) {
+    .masonry-grid { column-count: 1; column-gap: 0; }
+}
+
+.evidencia-card {
+    break-inside: avoid;
+    margin-bottom: 2rem;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    box-shadow: 0 10px 30px rgba(26, 77, 74, 0.08);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s ease;
+}
+
+.evidencia-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(26, 77, 74, 0.15);
+    border-color: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.evidencia-info {
+    padding: 1.2rem 0.5rem 0.5rem;
+}
+
+.evidencia-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.8rem;
+    gap: 1rem;
+}
+
+.evidencia-header h5 {
+    font-family: var(--font-body);
+    font-weight: 700;
+    color: var(--clr-primary);
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.2;
+}
+
+.evidencia-badge {
+    background: var(--clr-highlight);
+    color: var(--clr-accent);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.3rem 0.8rem;
+    border-radius: 99px;
+    white-space: nowrap;
+}
+
+.evidencia-msg {
+    font-size: 0.95rem;
+    color: var(--clr-text-muted);
+    font-style: italic;
+    line-height: 1.5;
+    margin: 0;
+    border-left: 3px solid var(--clr-accent-light);
+    padding-left: 0.8rem;
+}
