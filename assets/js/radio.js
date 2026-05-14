@@ -22,7 +22,8 @@ class SonariaRadioOrientacion {
         this.emergencyAudio = null;
         this.emergencyUrls = [
             'assets/audio/emergencia1.mp3',
-            'assets/audio/emergencia2.mp3'
+            'assets/audio/emergencia2.mp3',
+            'assets/audio/emergencia3.mp3'
         ];
         this.currentEmergencyIndex = 0;
 
