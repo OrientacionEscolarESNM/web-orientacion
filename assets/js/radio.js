@@ -228,7 +228,18 @@ class SonariaRadioOrientacion {
 
                 const trackSpan = document.querySelector('.radio-name');
                 if (trackSpan) {
-                    const newTitle = title || "Sonaría Radio";
+                    let newTitle = title || "Sonaria Radio";
+                    
+                    // Reparar Mojibake (UTF-8 interpretado como Latin-1)
+                    try {
+                        if (newTitle.includes('Ã') || newTitle.includes('ð')) {
+                            newTitle = decodeURIComponent(escape(newTitle));
+                        }
+                    } catch (e) {
+                        // Si falla la reparación, limpiar caracteres raros manualmente como fallback
+                        newTitle = newTitle.replace(/Ã¡/g, 'á').replace(/Ã©/g, 'é').replace(/Ã­/g, 'í').replace(/Ã³/g, 'ó').replace(/Ãº/g, 'ú').replace(/Ã±/g, 'ñ');
+                    }
+
                     if (trackSpan.textContent !== newTitle) {
                         trackSpan.textContent = newTitle;
                     }
