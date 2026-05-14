@@ -26,9 +26,11 @@ class SonariaRadioOrientacion {
             'assets/audio/emergencia3.mp3'
         ];
         this.currentEmergencyIndex = 0;
+        this.metadataTimer = null;
 
         this.createPlayerUI();
         this.initListeners();
+        this.startMetadataUpdates();
     }
 
     createPlayerUI() {
@@ -201,6 +203,40 @@ class SonariaRadioOrientacion {
         status.textContent = text;
         status.classList.add('active');
         setTimeout(() => status.classList.remove('active'), 3000);
+    }
+
+    startMetadataUpdates() {
+        this.updateMetadata();
+        this.metadataTimer = setInterval(() => this.updateMetadata(), 10000); // Cada 10s
+    }
+
+    async updateMetadata() {
+        try {
+            const response = await fetch('https://radio.sonariaradio.online/status-json.xsl');
+            const data = await response.json();
+            
+            if (data && data.icestats && data.icestats.source) {
+                const source = data.icestats.source;
+                let title = "";
+                
+                if (Array.isArray(source)) {
+                    const radio = source.find(s => s.listenurl && s.listenurl.includes('/radio.mp3'));
+                    title = radio ? radio.title : "";
+                } else {
+                    title = source.title || "";
+                }
+
+                const trackSpan = document.querySelector('.radio-name');
+                if (trackSpan) {
+                    const newTitle = title || "Sonaría Radio";
+                    if (trackSpan.textContent !== newTitle) {
+                        trackSpan.textContent = newTitle;
+                    }
+                }
+            }
+        } catch (err) {
+            // Error silencioso
+        }
     }
 }
 
