@@ -951,118 +951,130 @@
     </script>
     <script src="assets/js/radio.js"></script>
 
-    <!-- ═══════════ WIDGET ASISTENTE FARO ═══════════ -->
+    <!-- Botón Flotante y Ventana del Asistente Faro -->
+    <div id="faro-widget-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; display: flex; flex-direction: column; align-items: flex-end; gap: 15px;">
+        
+        <!-- Botón de apertura: Burbuja Horizontal Semitransparente (Glassmorphism) -->
+        <button id="faro-widget-button" style="display: flex; align-items: center; gap: 10px; padding: 12px 22px; border-radius: 30px; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1.5px solid rgba(255, 255, 255, 0.15); color: white; cursor: pointer; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); outline: none; font-weight: 600; font-size: 14px; position: relative;">
+            <span style="font-size: 20px; line-height: 1; display: inline-block; animation: faro-shake 4s infinite ease-in-out;">💬</span>
+            <span style="color: #ffffff; letter-spacing: 0.02em;">Soy Faro - ¿Puedo ayudarte?</span>
+            <!-- Indicador de notificación parpadeante -->
+            <span style="width: 8px; height: 8px; background-color: #ef4444; border-radius: 50%; display: inline-block; animation: faro-pulse 2s infinite; margin-left: 2px;"></span>
+        </button>
+
+        <!-- Botón de Cierre (Solo visible cuando el chat está abierto) -->
+        <button id="faro-close-widget-button" style="width: 50px; height: 50px; border-radius: 50%; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1.5px solid rgba(255, 255, 255, 0.2); color: white; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); font-size: 20px; font-weight: 700; transition: all 0.2s ease; outline: none;">
+            ✕
+        </button>
+
+        <!-- Ventana de Chat (Iframe de Faro) -->
+        <div id="faro-widget-window" style="position: absolute; bottom: 70px; right: 0; width: 345px; height: 520px; max-height: calc(100vh - 110px); border-radius: 20px; overflow: hidden; box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35); border: 1.5px solid rgba(255, 255, 255, 0.1); display: flex; flex-direction: column; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); transform: translateY(15px) scale(0.96); opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1); transform-origin: bottom right;">
+            
+            <!-- Contenedor Único del Iframe (Eliminada la cabecera externa para evitar duplicidad) -->
+            <div style="flex: 1; position: relative; background: transparent;">
+                <!-- Spinner de Carga Glassmorphic -->
+                <div id="faro-iframe-loader" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(15, 23, 42, 0.95); color: #94a3b8; transition: opacity 0.3s ease;">
+                    <div style="width: 35px; height: 35px; border: 3px solid rgba(59, 130, 246, 0.15); border-top-color: #3b82f6; border-radius: 50%; animation: faro-spin 1s infinite linear; margin-bottom: 12px;"></div>
+                    <span style="font-size: 11px; font-weight: 500; letter-spacing: 0.05em; color: #cbd5e1;">Iniciando Faro...</span>
+                </div>
+                <!-- Iframe con transparencia nativa y bordes perfectos -->
+                <iframe id="faro-iframe" src="" style="width: 100%; height: 100%; border: none; border-radius: 20px; opacity: 0; transition: opacity 0.3s ease; background: transparent;"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estilos de Animación del Widget -->
     <style>
-        @keyframes faro-spin { to { transform: rotate(360deg); } }
-        @keyframes faro-bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
-        #faro-fab:hover { transform: scale(1.08) !important; }
-        @media (max-width: 500px) {
-            #faro-window {
-                right: 0 !important; left: 0 !important; bottom: 0 !important;
-                width: 100% !important; height: 100dvh !important;
-                max-height: 100dvh !important; border-radius: 0 !important;
+        @keyframes faro-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes faro-pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        @keyframes faro-shake {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+        #faro-widget-button:hover {
+            transform: scale(1.03);
+            background: rgba(15, 23, 42, 0.85);
+            border-color: rgba(255, 255, 255, 0.25);
+        }
+        #faro-close-widget-button:hover {
+            transform: scale(1.05) rotate(90deg);
+            background: rgba(239, 68, 68, 0.85);
+            border-color: rgba(239, 68, 68, 0.4);
+        }
+        @media (max-width: 480px) {
+            #faro-widget-container {
+                bottom: 10px !important;
+                right: 10px !important;
+            }
+            #faro-widget-window {
+                position: fixed;
+                bottom: 0 !important;
+                right: 0 !important;
+                left: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                max-height: 100% !important;
+                border-radius: 0 !important;
             }
         }
     </style>
 
-    <!-- Botón flotante FAB -->
-    <button id="faro-fab" onclick="faroToggle()" style="
-        position: fixed; bottom: 24px; right: 24px; z-index: 9999;
-        width: 58px; height: 58px; border-radius: 50%;
-        background: linear-gradient(145deg, #1e7e6e, #0d5c4f);
-        border: none; color: white; cursor: pointer;
-        display: flex; align-items: center; justify-content: center;
-        box-shadow: 0 6px 20px rgba(14, 92, 78, 0.5);
-        transition: transform 0.2s ease, box-shadow 0.2s ease; outline: none;">
-        <span id="faro-icon" style="font-size:24px; animation: faro-bounce 3s ease-in-out infinite;">💬</span>
-        <span style="position:absolute; top:5px; right:5px; width:11px; height:11px; background:#ef4444; border:2px solid white; border-radius:50%;"></span>
-    </button>
-
-    <!-- Ventana del chat -->
-    <div id="faro-window" style="
-        position: fixed; bottom: 94px; right: 24px; z-index: 9998;
-        width: 360px; height: 560px; max-height: calc(100vh - 110px);
-        border-radius: 16px; overflow: hidden;
-        display: flex; flex-direction: column;
-        box-shadow: 0 12px 48px rgba(0,0,0,0.22), 0 2px 8px rgba(0,0,0,0.1);
-        border: 1px solid rgba(0,0,0,0.09);
-        background: #ffffff;
-        opacity: 0; transform: translateY(14px) scale(0.96);
-        pointer-events: none;
-        transition: opacity 0.22s ease, transform 0.22s ease;">
-
-        <!-- Cabecera -->
-        <div style="background: linear-gradient(135deg, #1a6b5c 0%, #0d4f42 100%); padding: 13px 15px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
-            <div style="display:flex; align-items:center; gap:10px;">
-                <div style="width:38px; height:38px; border-radius:10px; background:rgba(255,255,255,0.15); display:flex; align-items:center; justify-content:center; font-size:20px;">🧠</div>
-                <div>
-                    <div style="color:white; font-weight:700; font-size:14px; font-family:inherit;">Asistente Faro</div>
-                    <div style="display:flex; align-items:center; gap:4px; margin-top:2px;">
-                        <div style="width:7px; height:7px; border-radius:50%; background:#4ade80; box-shadow:0 0 7px #4ade80;"></div>
-                        <span style="color:rgba(255,255,255,0.82); font-size:11px; font-family:inherit;">En línea ahora</span>
-                    </div>
-                </div>
-            </div>
-            <!-- Botón cerrar — siempre visible -->
-            <button onclick="faroToggle()" style="
-                width:34px; height:34px; border-radius:50%;
-                background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.3);
-                color:white; font-size:18px; cursor:pointer; outline:none;
-                display:flex; align-items:center; justify-content:center;
-                transition:background 0.15s; font-family:inherit;"
-                onmouseover="this.style.background='rgba(255,255,255,0.28)'"
-                onmouseout="this.style.background='rgba(255,255,255,0.15)'"
-                title="Cerrar">✕</button>
-        </div>
-
-        <!-- Spinner de carga -->
-        <div id="faro-loader" style="position:absolute; inset:56px 0 0 0; background:#f1f5f9; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; z-index:2; transition:opacity 0.3s;">
-            <div style="width:34px; height:34px; border:3px solid #e2e8f0; border-top-color:#1a6b5c; border-radius:50%; animation:faro-spin 0.85s linear infinite;"></div>
-            <span style="font-size:12px; color:#64748b; font-weight:500; font-family:inherit;">Iniciando Faro...</span>
-        </div>
-
-        <!-- Iframe -->
-        <iframe id="faro-iframe" src="" title="Asistente Faro" style="flex:1; border:none; opacity:0; transition:opacity 0.3s ease; display:block;"></iframe>
-    </div>
-
+    <!-- Script de Control del Widget -->
     <script>
-    (function(){
-        var FARO_URL = 'https://orientacionescolaresnm.github.io/Faro---Asistente/#/chat';
-        var open = false, loaded = false;
-        window.faroToggle = function(){
-            var win  = document.getElementById('faro-window');
-            var icon = document.getElementById('faro-icon');
-            var ifrm = document.getElementById('faro-iframe');
-            var ldng = document.getElementById('faro-loader');
-            open = !open;
-            if(open){
-                win.style.opacity = '1';
-                win.style.transform = 'translateY(0) scale(1)';
-                win.style.pointerEvents = 'auto';
-                icon.textContent = '✕';
-                icon.style.fontSize = '20px';
-                icon.style.animation = 'none';
-                if(!loaded){ loaded = true;
-                    ifrm.src = FARO_URL;
-                    ifrm.onload = function(){
-                        ldng.style.opacity = '0';
-                        ifrm.style.opacity = '1';
-                        setTimeout(function(){ ldng.style.display='none'; }, 320);
-                    };
+        document.addEventListener('DOMContentLoaded', () => {
+            const faroBtn = document.getElementById('faro-widget-button');
+            const faroCloseWidgetBtn = document.getElementById('faro-close-widget-button');
+            const faroWindow = document.getElementById('faro-widget-window');
+            const faroIframe = document.getElementById('faro-iframe');
+            const faroLoader = document.getElementById('faro-iframe-loader');
+            
+            const iframeUrl = "https://orientacionescolaresnm.github.io/Faro---Asistente/#/chat";
+            let isLoaded = false;
+            let isOpen = false;
+
+            const toggleFaro = () => {
+                isOpen = !isOpen;
+                if (isOpen) {
+                    // Cargar el iframe solo cuando se abre la primera vez para ahorrar recursos
+                    if (!isLoaded) {
+                        faroIframe.src = iframeUrl;
+                        faroIframe.onload = () => {
+                            faroLoader.style.opacity = '0';
+                            faroIframe.style.opacity = '1';
+                            setTimeout(() => faroLoader.style.display = 'none', 300);
+                            isLoaded = true;
+                        };
+                    }
+                    
+                    // Mostrar ventana y cambiar botones
+                    faroWindow.style.pointerEvents = 'auto';
+                    faroWindow.style.opacity = '1';
+                    faroWindow.style.transform = 'translateY(0) scale(1)';
+                    
+                    faroBtn.style.display = 'none';
+                    faroCloseWidgetBtn.style.display = 'flex';
+                } else {
+                    // Ocultar ventana y cambiar botones
+                    faroWindow.style.pointerEvents = 'none';
+                    faroWindow.style.opacity = '0';
+                    faroWindow.style.transform = 'translateY(20px) scale(0.96)';
+                    
+                    faroBtn.style.display = 'flex';
+                    faroCloseWidgetBtn.style.display = 'none';
                 }
-            } else {
-                win.style.opacity = '0';
-                win.style.transform = 'translateY(14px) scale(0.96)';
-                win.style.pointerEvents = 'none';
-                icon.textContent = '💬';
-                icon.style.fontSize = '24px';
-                icon.style.animation = 'faro-bounce 3s ease-in-out infinite';
-            }
-        };
-    })();
+            };
+
+            faroBtn.addEventListener('click', toggleFaro);
+            faroCloseWidgetBtn.addEventListener('click', toggleFaro);
+        });
     </script>
-    <!-- ═══════════ FIN WIDGET FARO ═══════════ -->
-
-
 </body>
+
 </html>
