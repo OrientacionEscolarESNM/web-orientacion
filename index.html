@@ -968,31 +968,17 @@
         </button>
 
         <!-- Ventana de Chat (Iframe de Faro) -->
-        <div id="faro-widget-window" style="position: absolute; bottom: 80px; right: 0; width: 380px; height: 600px; max-height: calc(100vh - 120px); border-radius: 16px; overflow: hidden; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15); border: 1px solid rgba(0, 0, 0, 0.08); display: flex; flex-direction: column; background: #ffffff; transform: translateY(20px) scale(0.95); opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1); transform-origin: bottom right;">
-            <!-- Cabecera de la Ventana (Gradiente Premium Azul/Morado) -->
-            <div style="background: linear-gradient(135deg, #2563eb, #7c3aed); padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(0, 0, 0, 0.05);">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(255, 255, 255, 0.2); display: flex; align-items: center; justify-content: center; font-size: 18px; color: white; backdrop-filter: blur(4px);">🧠</div>
-                    <div>
-                        <h4 style="margin: 0; color: white; font-size: 14px; font-weight: 600; font-family: inherit;">Asistente Faro</h4>
-                        <span style="font-size: 10px; color: #34d399; display: flex; align-items: center; gap: 4px; font-weight: 500;">
-                            <span style="width: 6px; height: 6px; background-color: #34d399; border-radius: 50%; display: inline-block; box-shadow: 0 0 8px #34d399;"></span> Activo Ahora
-                        </span>
-                    </div>
+        <div id="faro-widget-window" style="position: absolute; bottom: 70px; right: 0; width: 345px; height: 520px; max-height: calc(100vh - 110px); border-radius: 20px; overflow: hidden; box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35); border: 1.5px solid rgba(255, 255, 255, 0.1); display: flex; flex-direction: column; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); transform: translateY(15px) scale(0.96); opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1); transform-origin: bottom right;">
+            
+            <!-- Contenedor Único del Iframe (Eliminada la cabecera externa para evitar duplicidad) -->
+            <div style="flex: 1; position: relative; background: transparent;">
+                <!-- Spinner de Carga Glassmorphic -->
+                <div id="faro-iframe-loader" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(15, 23, 42, 0.95); color: #94a3b8; transition: opacity 0.3s ease;">
+                    <div style="width: 35px; height: 35px; border: 3px solid rgba(59, 130, 246, 0.15); border-top-color: #3b82f6; border-radius: 50%; animation: faro-spin 1s infinite linear; margin-bottom: 12px;"></div>
+                    <span style="font-size: 11px; font-weight: 500; letter-spacing: 0.05em; color: #cbd5e1;">Iniciando Faro...</span>
                 </div>
-                <!-- Botón Cerrar en Cabecera -->
-                <button id="faro-header-close-button" style="background: transparent; border: none; color: rgba(255, 255, 255, 0.8); font-size: 24px; cursor: pointer; transition: all 0.2s; outline: none; padding: 4px; line-height: 0.5;">&times;</button>
-            </div>
-
-            <!-- Contenedor del Iframe -->
-            <div style="flex: 1; position: relative; background: #ffffff;">
-                <!-- Spinner de Carga -->
-                <div id="faro-iframe-loader" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #ffffff; color: #475569; transition: opacity 0.3s ease;">
-                    <div style="width: 40px; height: 40px; border: 3px solid rgba(37, 99, 235, 0.1); border-top-color: #2563eb; border-radius: 50%; animation: faro-spin 1s infinite linear; margin-bottom: 12px;"></div>
-                    <span style="font-size: 12px; font-weight: 500; font-family: inherit;">Iniciando Faro...</span>
-                </div>
-                <!-- Iframe -->
-                <iframe id="faro-iframe" src="" style="width: 100%; height: 100%; border: none; border-radius: 0 0 16px 16px; opacity: 0; transition: opacity 0.3s ease; background: #ffffff;"></iframe>
+                <!-- Iframe con transparencia nativa y bordes perfectos -->
+                <iframe id="faro-iframe" src="" style="width: 100%; height: 100%; border: none; border-radius: 20px; opacity: 0; transition: opacity 0.3s ease; background: transparent;"></iframe>
             </div>
         </div>
     </div>
@@ -1045,7 +1031,6 @@
         document.addEventListener('DOMContentLoaded', () => {
             const faroBtn = document.getElementById('faro-widget-button');
             const faroCloseWidgetBtn = document.getElementById('faro-close-widget-button');
-            const faroHeaderCloseBtn = document.getElementById('faro-header-close-button');
             const faroWindow = document.getElementById('faro-widget-window');
             const faroIframe = document.getElementById('faro-iframe');
             const faroLoader = document.getElementById('faro-iframe-loader');
@@ -1079,7 +1064,7 @@
                     // Ocultar ventana y cambiar botones
                     faroWindow.style.pointerEvents = 'none';
                     faroWindow.style.opacity = '0';
-                    faroWindow.style.transform = 'translateY(20px) scale(0.95)';
+                    faroWindow.style.transform = 'translateY(20px) scale(0.96)';
                     
                     faroBtn.style.display = 'flex';
                     faroCloseWidgetBtn.style.display = 'none';
@@ -1088,7 +1073,6 @@
 
             faroBtn.addEventListener('click', toggleFaro);
             faroCloseWidgetBtn.addEventListener('click', toggleFaro);
-            faroHeaderCloseBtn.addEventListener('click', toggleFaro);
         });
     </script>
 </body>
