@@ -1031,13 +1031,7 @@
             #faro-iframe {
                 width: 100% !important;
                 height: 100% !important;
-                transform: none !important;
-                border-radius: 0 !important;
-            }
-        }
-    </style>
-
-    <!-- Script de Control del Widget -->
+                   <!-- Script de Control del Widget -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const faroBtn = document.getElementById('faro-widget-button');
@@ -1061,6 +1055,55 @@
                             faroIframe.style.opacity = '1';
                             setTimeout(() => faroLoader.style.display = 'none', 300);
                             isLoaded = true;
+
+                            // Inyectar estilo y observador dinámico para el botón de Emergencia
+                            try {
+                                const injectStyles = () => {
+                                    const iframeDoc = faroIframe.contentDocument || faroIframe.contentWindow.document;
+                                    
+                                    // Buscar botones o enlaces que contengan "Emergencia"
+                                    const xpath = "//span[contains(text(), 'Emergencia') or contains(text(), 'emergencia')] | //button[contains(text(), 'Emergencia') or contains(text(), 'emergencia')] | //a[contains(text(), 'Emergencia') or contains(text(), 'emergencia')]";
+                                    const result = iframeDoc.evaluate(xpath, iframeDoc, null, XPathResult.ANY_TYPE, null);
+                                    let element = result.iterateNext();
+                                    
+                                    while (element) {
+                                        let button = element;
+                                        // Subir en el DOM hasta encontrar el contenedor botón o enlace
+                                        while (button && button.tagName !== 'BUTTON' && button.tagName !== 'A' && button.tagName !== 'BODY') {
+                                            button = button.parentElement;
+                                        }
+                                        if (button && button.tagName !== 'BODY') {
+                                            button.style.backgroundColor = '#ef4444';
+                                            button.style.color = '#ffffff';
+                                            button.style.border = 'none';
+                                            
+                                            // Revertir el filtro del iframe en este botón específico
+                                            button.style.filter = 'invert(1) hue-rotate(180deg)';
+                                            
+                                            // Forzar a que los textos e íconos internos sean blancos
+                                            const childSpans = button.getElementsByTagName('span');
+                                            for (let span of childSpans) {
+                                                span.style.color = '#ffffff';
+                                            }
+                                            const childSvgs = button.getElementsByTagName('svg');
+                                            for (let svg of childSvgs) {
+                                                svg.style.fill = '#ffffff';
+                                                svg.style.color = '#ffffff';
+                                            }
+                                        }
+                                        element = result.iterateNext();
+                                    }
+                                };
+
+                                injectStyles();
+                                
+                                // Escuchar cambios en el DOM del iframe por si el usuario navega
+                                const iframeDoc = faroIframe.contentDocument || faroIframe.contentWindow.document;
+                                const observer = new MutationObserver(injectStyles);
+                                observer.observe(iframeDoc.body, { childList: true, subtree: true });
+                            } catch (e) {
+                                console.warn("No se pudo inyectar el estilo (restringido en local, funcionará en producción):", e);
+                            }
                         };
                     }
                     
@@ -1087,5 +1130,4 @@
         });
     </script>
 </body>
-
 </html>
